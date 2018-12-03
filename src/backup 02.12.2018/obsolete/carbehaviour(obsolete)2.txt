@@ -1,0 +1,86 @@
+package TraffiCarBehaviours;
+
+import jade.core.*;
+import jade.core.behaviours.*;
+import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
+import jade.domain.DFService;
+import jade.domain.FIPAException;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
+import java.util.concurrent.TimeUnit;
+
+public class CarBehaviour extends CyclicBehaviour 
+{
+	private String status;	
+	private int x;
+	public CarBehaviour(Agent a)
+	{
+		super(a);
+		x=0;
+		status="GO";
+	}
+		
+	public void action()
+	{
+		if(status=="GO")
+		{
+			try
+			{
+				write();
+			}
+			catch(Exception ex)
+			{
+			}
+		}
+		if(status=="STOP")
+		{
+			if(MessageReceived())
+				{
+					status="GO";
+				}
+		}
+	}
+	private void write() throws InterruptedException, FileNotFoundException 
+	{
+		
+		PrintWriter outputStream=GetPrintWriter("tekst.txt");
+		if(outputStream!=null)
+		{			
+			for(int i=0;i<10;i++)
+			{
+				if(MessageReceived())
+				{
+					outputStream.close();
+					status="STOP";
+					System.out.println("Status of "+myAgent.getAID().getName()+" changed.");
+					return;
+				}
+			x=x+1;
+			outputStream.println(x + myAgent.getAID().getName());
+			TimeUnit.SECONDS.sleep(1);
+			}
+			outputStream.close();
+		}
+		else
+		{
+			System.out.println("outputStream ==null");
+		}
+	}
+	
+	private PrintWriter GetPrintWriter(String name) throws FileNotFoundException
+	{
+			PrintWriter outputStream=new PrintWriter(new FileOutputStream(name, true));
+			return outputStream;		
+	}
+	private boolean MessageReceived()
+	{
+		ACLMessage msg = myAgent.receive();
+		if(msg != null) return true;
+		else  return false;
+	}
+		
+}

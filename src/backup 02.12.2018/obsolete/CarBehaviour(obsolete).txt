@@ -1,0 +1,50 @@
+package TraffiCarBehaviours;
+
+import jade.core.*;
+import jade.core.behaviours.*;
+import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
+import jade.domain.DFService;
+import jade.domain.FIPAException;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
+import TraffiCarBehaviours.*;
+
+public class CarBehaviour extends CyclicBehaviour 
+{
+	private String status;	
+	private WriteToFileBehaviour writeBehaviour;
+	private StopBehaviour stopBehaviour;
+	public CarBehaviour(Agent a)
+	{
+		super(a);
+		WriteToFileBehaviour writeBehaviour = new WriteToFileBehaviour(myAgent);
+		StopBehaviour stopBehaviour=new StopBehaviour(myAgent);
+		addSubBehaviour(writeBehaviour);
+		status="GO";
+	}
+		
+	public void action()
+	{
+		ACLMessage msg = myAgent.receive();
+		if(msg != null)
+		{
+		String content = msg.getContent();
+		if ((content != null) && (content.indexOf("CHANGE STATUS") != -1))
+		{
+			if(status=="GO")
+			{
+				removeSubBehaviour(writeBehaviour);
+				stopBehaviour=new StopBehaviour(myAgent);
+				addSubBehaviour(stopBehaviour);
+			}
+			if(Status=="STOP")
+			{
+				removeSubBehaviour(stopBehaviour);
+				writeBehaviour = new WriteToFileBehaviour(myAgent);
+				addSubBehaviour(writeBehaviour);
+			}				
+		}
+	}
+}
+}
