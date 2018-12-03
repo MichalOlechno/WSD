@@ -9,6 +9,9 @@ import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import java.util.Random;
+import java.awt.List;
+import java.util.ArrayList;
+import java.util.Arrays;
 import TrafficarClasses.*;
 
 public class CarBehaviour extends CyclicBehaviour 
@@ -16,9 +19,11 @@ public class CarBehaviour extends CyclicBehaviour
 	private String status;	
 	private double x;
 	private double y;
+	private double x0;
+	private double y0;
 	private String currentDirection;
 	private String mode;
-	private Agent nextAgent;
+	private AgentClass nextAgent;
 	private String nextAgentmode;
 	private String lightColor;
 	private DFAgentDescription trafficManagerTemplate;
@@ -27,13 +32,15 @@ public class CarBehaviour extends CyclicBehaviour
 	private long startTime;
 	private long measureTime;	
 	private double v;
-	private boolean messageSent=0;
+	private boolean messageSent=false;
 	
-	public CarBehaviour(Agent a,int X,int Y,String CurrentDirection)
+	public CarBehaviour(Agent a,double X,double Y,String CurrentDirection)
 	{
 		super(a);
 		x=X;
 		y=Y;
+		x0=X;
+		y0=Y;
 		currentDirection=CurrentDirection;
 		mode="run";
 		nextAgent=null;
@@ -44,7 +51,7 @@ public class CarBehaviour extends CyclicBehaviour
 		requestMessage=MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
 		informMessage=MessageTemplate.MatchPerformative(ACLMessage.INFORM);
 		startTime = System.currentTimeMillis();
-		v=1
+		v=1;
 	}
 		
 	public void action()
@@ -68,18 +75,18 @@ public class CarBehaviour extends CyclicBehaviour
 	public void move()
 	{
 		nextAgent=getNextAgent(x,y,currentDirection);
-		if(nextAgent.Type) == null) 
+		if(nextAgent.type == null) 
 		{
 			takeStep(currentDirection);
         }
-		if(nextAgent.Type) == "intersection") 
+		if(nextAgent.type == "intersection") 
 		{
 			
-			if(nextAgent.LightColor=="red")
+			if(nextAgent.lightColor=="red")
 			{
 				mode="stop";
 			}
-			if(nextAgent.LightColor=="green")
+			if(nextAgent.lightColor=="green")
 			{
 				mode="run";
 				currentDirection=GetRandomDirection(currentDirection);
@@ -89,9 +96,9 @@ public class CarBehaviour extends CyclicBehaviour
 				startTime=System.currentTimeMillis();
 			}
         }
-		if(nextAgent.Type) == "car")
+		if(nextAgent.type == "car")
 		{
-			if(abs(nextAgent.x - x)>10)
+			if(Math.abs(nextAgent.x - x)>10)
 			{
 				takeStep(currentDirection);
 			}
@@ -129,32 +136,32 @@ public class CarBehaviour extends CyclicBehaviour
 	
 	
 	
-	public AgentClass getNextAgent(int x,int y,String currentDirection)
+	public AgentClass getNextAgent(double x,double y,String currentDirection)
 	{
 		//implement message query-inform and wait for response.
-		SendQueryInformMessage();
-		ACLMessage msg = new Message.Receive(Response)
+		//SendQueryInformMessage();
+		//Change to response
+		ACLMessage msg = myAgent.receive(requestMessage);
 		while(msg==null)
 		{
-			msg=Message.Receive(Response);
+			msg=myAgent.receive(requestMessage);
 		}
-		agentClass = ParseAgent(msg.getContent();
-		return null;
+		return ParseAgent(msg.getContent());
+		
 	}
 	
 	public AgentClass ParseAgent(String content)
 	{
-		List<String> stringList = Arrays.asList(content().split(" "));
+		String[] stringList = content.split(" ");
 		AgentClass agent=new AgentClass();
-		agent.type=stringList.get(1);
-		agent.x=Double.parseDouble(stringList.get(2));
-		agent.y=Double.parseDouble(stringList.get(3));
-		agent.lightColor=stringList.get(4);
+		agent.type=stringList[0];
+		agent.x=Double.parseDouble(stringList[1]);
+		agent.y=Double.parseDouble(stringList[2]);
+		agent.lightColor=stringList[3];
 		return agent;
-			
 	}
 	
-	public boolean isNeedToMakePlaceForAmbulance(int x, int y, String currentDirection)
+	public boolean isNeedToMakePlaceForAmbulance(double x, double y, String currentDirection)
 	{	
 		//get type Request
 		//ACLMessage msg=ACLMessage.Receive()
@@ -180,11 +187,11 @@ public class CarBehaviour extends CyclicBehaviour
 		}
 		if (currentDirection == "east")
 		{
-			x = x0 + v*0.001*(measureTime-startTime)
+			x = x0 + v*0.001*(measureTime-startTime);
 		}
 		if (currentDirection == "west")
 		{
-			x = x0 - v*0.001*(measureTime-startTime)
+			x = x0 - v*0.001*(measureTime-startTime);
 		}
 	}
 		
@@ -212,44 +219,44 @@ public class CarBehaviour extends CyclicBehaviour
 	void stop()
 	{
 		//send queryIf
-		ACLMessage[] msgs=new ACLMessage[]();
-		msgs[] = ReceiveMessages(responseTemplate);
+		ArrayList<ACLMessage> msgs=new ArrayList<ACLMessage>();
+		msgs = ReceiveMessages(requestMessage);
 		try
 		{
-			msgs = ReceiveMessages(responseTemplate);
+			msgs = ReceiveMessages(requestMessage);
 		}
 		catch(Exception ex)
 		{
 			
 		}
-		if(msgm!==null && ParseAgent(msg.getContent()).ambulance==False)
-		{
-			x=x0;
-			y=y0;
-			startTime=System.currentTimeMillis();
-			mode="run";
-		}
+		//if(msgs!=null && ParseAgent(msgs.get(1).getContent()).ambulance==null)
+		//{
+		//	x=x0;
+		//	y=y0;
+		//	startTime=System.currentTimeMillis();
+		//	mode="run";
+		//}
 	}
 	
-	private ACLMessage[] ReceiveMessages()
+	private ArrayList<ACLMessage> ReceiveMessages()
 	{
-		ACLMessage[] msgs = new ACLMessage[]();
-		ACLMessage msg=myAgent.Receive();
+		ArrayList<ACLMessage> msgs = new ArrayList<ACLMessage>();
+		ACLMessage msg=myAgent.receive();
 		while(msg!=null)
 		{
 		msgs.add(msg);
-		msg = myAgent.receive()
+		msg = myAgent.receive();
 		}
 		return msgs;
 	}
-	private ACLMessage[] ReceiveMessages(MessageTemplate template)
+	private ArrayList<ACLMessage> ReceiveMessages(MessageTemplate template)
 	{
-		ACLMessage[] msgs = new ACLMessage[]();
+		ArrayList<ACLMessage> msgs = new ArrayList<ACLMessage>();
 		ACLMessage msg = myAgent.receive(template);
 		while(msg!=null)
 		{
 		msgs.add(msg);
-		msg = myAgent.receive(template)
+		msg = myAgent.receive(template);
 		}
 		return msgs;
 	}

@@ -9,6 +9,12 @@ import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
+import java.awt.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
 import TrafficarClasses.*;
 
 public class TrafficManagerBehaviour extends CyclicBehaviour 
@@ -22,7 +28,7 @@ public class TrafficManagerBehaviour extends CyclicBehaviour
 	private MessageTemplate requestMessage;
 	private MessageTemplate informMessage;
 	private MessageTemplate informIfMessage;
-	private AgentClass[] agents;
+	private ArrayList<AgentClass> agents;
 	private long startTime;
 	private long tempTime;
 	private long currentTime;
@@ -46,15 +52,17 @@ public class TrafficManagerBehaviour extends CyclicBehaviour
 		carAgents=GetAgents(carTemplate);
 		intersectionAgents=GetAgents(intersectionTemplate);
 		ambulanceAgents=GetAgents(ambulanceTemplate);
-		agents=new AgentClass[]();
+		agents=new ArrayList<AgentClass>();
 		tempTime=System.currentTimeMillis();
 		currentTime=System.currentTimeMillis();
 		while((currentTime-tempTime)<1000)
 		{
 		agents=ReceiveAgentState();
-		if(ambulance!=null)
-			HandleAmbulance();
-		GetCarsRequests();
+		if(ambulanceAgents!=null)
+		{
+			//HandleAmbulance();
+		}
+		//GetCarsRequests();
 		currentTime=System.currentTimeMillis();
 		}
 		
@@ -65,7 +73,8 @@ public class TrafficManagerBehaviour extends CyclicBehaviour
 	{
 		ACLMessage msg = new ACLMessage( ACLMessage.REQUEST );
 		msg.setContent("CHANGE STATUS");
-		for (int i = 0; i < result.length; ++i)
+		
+		for (int i = 0; i < carAgents.length; ++i)
 		{
 			msg.addReceiver(carAgents[i]);
 		}
@@ -79,16 +88,17 @@ public class TrafficManagerBehaviour extends CyclicBehaviour
 		template.addServices(sd);
 		return template;
 	}
-	public AgentClass[] ReceiveAgentState()
+	public ArrayList<AgentClass> ReceiveAgentState()
 	{
 		//ReceiveInformMessages
-		foreach(message in messages)
+		ArrayList<ACLMessage> messages = new ArrayList<ACLMessage>();
+		for(ACLMessage message:messages)
 		{
-			foreach(int i=0;i<agents.length;i++)
+			for(int i=0;i<agents.size();i++)
 			{
-				if(agent[i].AID=message.AID)
+				if(agents.get(i+1).aid==message.getSender())
 				{
-					agent[i]=ParseAgent(message.getContent())
+					agents.set(i+1,ParseAgent(message.getContent()));
 					break;
 				}	
 			}
@@ -97,41 +107,52 @@ public class TrafficManagerBehaviour extends CyclicBehaviour
 	}
 	
 
-	public AID[] GetAgents(DFAgentDescription template); 
+	public AID[] GetAgents(DFAgentDescription template)
 	{
-		result = DFService.search(myAgent, template); 
-		if(result==null)
-			return new AID[0];
-		agents = new AID[result.length];
-		for (int i = 0; i < result.length; ++i)
+		try
 		{
-			agents[i] = result[i].getName();	
+			DFAgentDescription[] result = DFService.search(myAgent, template); 
+			if(result==null)
+				return new AID[0];
+			AID[] tempAgents = new AID[result.length];
+			for (int i = 0; i < result.length; ++i)
+			{
+				tempAgents[i] = result[i].getName();	
+			}
+			return tempAgents;
 		}
-		return agents;
+		catch(FIPAException fe)
+		{
+			return null;
+		}
 	}
 	
 	public AgentClass ParseAgent(String content)
 	{
-		List<String> stringList = Arrays.asList(content().split(" "));
+		String[] stringList = content.split(" ");
 		AgentClass agent=new AgentClass();
-		agent.type=stringList.get(1);
-		agent.x=Double.parseDouble(stringList.get(2));
-		agent.y=Double.parseDouble(stringList.get(3));
-		agent.lightColor=stringList.get(4);
+		agent.type=stringList[0];
+		agent.x=Double.parseDouble(stringList[1]);
+		agent.y=Double.parseDouble(stringList[2]);
+		agent.lightColor=stringList[3];
 		return agent;
-			
 	}
 	
 	public void SaveAgentsStates()
 	{
-		foreach(agent in agents)
+		for(AgentClass agent:agents)
 		{
-			PrintWriter outputStream=new PrintWriter(new FileOutputStream((agent.getName() +".txt"), true));
-			if(outputStream!=null)
-			{			
-				outputStream.println(agent.type +" "+agent.x +" "+agent.y +" "+agent.light);
+			try
+			{
+				PrintWriter outputStream=new PrintWriter(new FileOutputStream((agent.aid.getName() +".txt"), true));
+				if(outputStream!=null)
+				{			
+					outputStream.println(agent.type +" "+agent.x +" "+agent.y +" "+agent.lightColor);
+				}
+				outputStream.close();
 			}
-			outputStream.close();
+			catch(FileNotFoundException ex)
+			{}
 		}
 	}
 }

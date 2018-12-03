@@ -1,10 +1,13 @@
 package TrafficarClasses;
 
+import jade.core.*;
+import jade.core.behaviours.*;
+
 public class AgentClass
 {
 	public AID aid;
-	public string type;
+	public String type;
 	public double x;
 	public double y;
-	public string lightColor;
+	public String lightColor;
 }

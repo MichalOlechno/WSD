@@ -17,8 +17,8 @@ import TraffiCarBehaviours2.*;
 
 public class CarAgent extends Agent {
 
-	private int x;
-	private int y;
+	private double x;
+	private double y;
 	private String currentDirection;
 	protected void setup() {
 		x=0;
