@@ -22,8 +22,8 @@ public class IntersectionAgent extends Agent {
 	private int y;
 	private String currentDirection;
 	protected void setup() {
-		x=10;
-		y=0;
+		x=0;
+		y=10;
 		DFAgentDescription dfd = new DFAgentDescription();
 		dfd.setName(getAID());
 		ServiceDescription sd = new ServiceDescription();

@@ -1,247 +1,41 @@
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 red
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 red
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 red
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 green
-intersection 10.0 0.0 green
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 red
-intersection 10.0 0.0 green
-16.156 intersection 10.0 0.0 null red
-18.187 intersection 10.0 0.0 null red
-20.196 intersection 10.0 0.0 null red
-22.202 intersection 10.0 0.0 null red
-24.214 intersection 10.0 0.0 null red
-26.224 intersection 10.0 0.0 null red
-28.239 intersection 10.0 0.0 null red
-30.247 intersection 10.0 0.0 null red
-32.26 intersection 10.0 0.0 null red
-34.268 intersection 10.0 0.0 null red
-36.277 intersection 10.0 0.0 null red
-38.287 intersection 10.0 0.0 null red
-40.293 intersection 10.0 0.0 null red
-42.305 intersection 10.0 0.0 null red
-44.317 intersection 10.0 0.0 null red
-46.322 intersection 10.0 0.0 null red
-48.33 intersection 10.0 0.0 null red
-50.337 intersection 10.0 0.0 null red
-52.341 intersection 10.0 0.0 null red
-54.352 intersection 10.0 0.0 null red
-56.355 intersection 10.0 0.0 null red
-58.36 intersection 10.0 0.0 null red
-60.367 intersection 10.0 0.0 null red
-62.37 intersection 10.0 0.0 null red
-64.373 intersection 10.0 0.0 null red
-16.314 intersection 10.0 0.0 null red
-18.324 intersection 10.0 0.0 null red
-20.333 intersection 10.0 0.0 null red
-22.34 intersection 10.0 0.0 null red
-24.356 intersection 10.0 0.0 null red
-26.364 intersection 10.0 0.0 null red
-28.372 intersection 10.0 0.0 null red
-30.378 intersection 10.0 0.0 null red
-32.387 intersection 10.0 0.0 null red
-34.392 intersection 10.0 0.0 null red
-36.4 intersection 10.0 0.0 null red
-38.406 intersection 10.0 0.0 null red
-40.41 intersection 10.0 0.0 null red
-42.416 intersection 10.0 0.0 null red
-14.165 intersection 10.0 0.0 null red
-16.207 intersection 10.0 0.0 null red
-18.217 intersection 10.0 0.0 null red
-20.238 intersection 10.0 0.0 null red
-22.246 intersection 10.0 0.0 null red
-24.252 intersection 10.0 0.0 null red
-26.258 intersection 10.0 0.0 null red
-28.262 intersection 10.0 0.0 null red
-30.266 intersection 10.0 0.0 null red
-14.233 intersection 10.0 0.0 null red
-16.249 intersection 10.0 0.0 null red
-18.256 intersection 10.0 0.0 null red
-20.266 intersection 10.0 0.0 null red
-22.278 intersection 10.0 0.0 null red
+14.127 intersection 0.0 20.0 null red
+16.14 intersection 0.0 20.0 null red
+18.155 intersection 0.0 20.0 null red
+20.165 intersection 0.0 20.0 null red
+22.172 intersection 0.0 20.0 null red
+24.177 intersection 0.0 20.0 null red
+26.181 intersection 0.0 20.0 null red
+28.185 intersection 0.0 20.0 null red
+30.189 intersection 0.0 20.0 null red
+32.193 intersection 0.0 20.0 null red
+34.197 intersection 0.0 20.0 null red
+36.2 intersection 0.0 20.0 null red
+38.204 intersection 0.0 20.0 null red
+40.208 intersection 0.0 20.0 null red
+42.213 intersection 0.0 20.0 null red
+44.218 intersection 0.0 20.0 null red
+46.222 intersection 0.0 20.0 null red
+48.227 intersection 0.0 20.0 null red
+50.233 intersection 0.0 20.0 null red
+52.239 intersection 0.0 20.0 null red
+54.243 intersection 0.0 20.0 null red
+56.249 intersection 0.0 20.0 null red
+58.255 intersection 0.0 20.0 null red
+60.259 intersection 0.0 20.0 null red
+62.262 intersection 0.0 20.0 null green
+64.267 intersection 0.0 20.0 null green
+66.272 intersection 0.0 20.0 null green
+68.277 intersection 0.0 20.0 null green
+70.281 intersection 0.0 20.0 null green
+72.287 intersection 0.0 20.0 null green
+74.293 intersection 0.0 20.0 null green
+76.299 intersection 0.0 20.0 null green
+78.305 intersection 0.0 20.0 null green
+80.31 intersection 0.0 20.0 null green
+82.315 intersection 0.0 20.0 null green
+84.32 intersection 0.0 20.0 null green
+86.325 intersection 0.0 20.0 null green
+88.333 intersection 0.0 20.0 null green
+90.338 intersection 0.0 20.0 null green
+92.343 intersection 0.0 20.0 null green
+94.349 intersection 0.0 20.0 null green

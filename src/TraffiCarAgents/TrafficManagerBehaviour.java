@@ -73,7 +73,7 @@ public class TrafficManagerBehaviour extends CyclicBehaviour
 	public void sendMessageToCarAgent(AgentClass carAgent,AgentClass requestedAgent)
 	{
 		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-		msg.setContent(requestedAgent.aid +" "+ requestedAgent.type + " " + requestedAgent.x +" "+requestedAgent.y +" "+requestedAgent.direction + " null");
+		msg.setContent(requestedAgent.type + " " + requestedAgent.x +" "+requestedAgent.y +" "+requestedAgent.direction + " "+requestedAgent.lightColor);
 		msg.addReceiver(carAgent.aid);
 		myAgent.send(msg);
 		System.out.println("message sent to" + carAgent.aid);
@@ -122,7 +122,7 @@ public class TrafficManagerBehaviour extends CyclicBehaviour
 		{
 			//System.out.println("TrafficManager gets a message !!!");
 			messages.add(msg);
-			msg=myAgent.receive(requestMessage);
+			msg=myAgent.receive(template);
 		}
 		return messages;
 	}
@@ -157,11 +157,11 @@ public class TrafficManagerBehaviour extends CyclicBehaviour
 		//	System.out.println("STRING LIST ELEMENTS:" + str);
 		//}
 		AgentClass agent=new AgentClass();
-		agent.type=stringList[9];
-		agent.x=Double.parseDouble(stringList[10]);
-		agent.y=Double.parseDouble(stringList[11]);
-		agent.direction=stringList[12];
-		agent.lightColor=stringList[13];
+		agent.type=stringList[0];
+		agent.x=Double.parseDouble(stringList[1]);
+		agent.y=Double.parseDouble(stringList[2]);
+		agent.direction=stringList[3];
+		agent.lightColor=stringList[4];
 		agent.name=message.getSender().getLocalName();
 		agent.aid=message.getSender();
 		return agent;
@@ -184,9 +184,10 @@ public class TrafficManagerBehaviour extends CyclicBehaviour
 			
 			for(AgentClass agent:agents)
 			{
-				if(new String(carAgent.direction).equals(agent.direction))
+				if((new String(carAgent.direction).equals(agent.direction)) || (new String(agent.direction).equals("null")))
 				{
 					tempAgent=calculateRelevantDistance(carAgent,agent,value);
+					System.out.println("agent type=" + agent.type +" x= " + agent.x + " y=" + agent.y + " direction " + agent.direction);
 					if(tempAgent!=null)
 						requestingAgent=tempAgent;
 				}

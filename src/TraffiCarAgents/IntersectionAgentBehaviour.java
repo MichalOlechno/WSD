@@ -22,7 +22,7 @@ public class IntersectionAgentBehaviour extends CyclicBehaviour
 	private long startTime;
 	private long tempTime;
 	private long currentTime;
-	private long lightChangingRatio=500000;
+	private long lightChangingRatio=30000;
 	private AID trafficManagerAID;
 	
 	public IntersectionAgentBehaviour(Agent a,double X,double Y) 
@@ -65,7 +65,7 @@ public class IntersectionAgentBehaviour extends CyclicBehaviour
 	public void sendStatusMessage()
 	{
 		ACLMessage msg = new ACLMessage( ACLMessage.INFORM );
-		msg.setContent(myAgent.getAID() +" intersection "+ x +" "+y +" null "+lightColor);
+		msg.setContent("intersection "+ x +" "+y +" null "+lightColor);
 		msg.addReceiver(trafficManagerAID);
 		myAgent.send(msg);
 	}

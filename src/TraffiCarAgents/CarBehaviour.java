@@ -13,6 +13,7 @@ import java.awt.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 import TrafficarClasses.*;
+import java.util.concurrent.TimeUnit;
 
 public class CarBehaviour extends CyclicBehaviour 
 {
@@ -63,7 +64,6 @@ public class CarBehaviour extends CyclicBehaviour
 		measureTime=System.currentTimeMillis();
 		sendStatusMessage();
 		nextAgent=getNextAgent();
-		System.out.println("moved on" + mode + " nextAgent type" + nextAgent.type);
 		while((measureTime-tempTime)<1000)
 		{
 	    boolean isAmbulance = isNeedToMakePlaceForAmbulance(x,y,currentDirection); // w kazdej chwili pytamy managera ruchu czy trzeba stanąc na bok i sie zatrzymac bo jedzie ambulans
@@ -92,6 +92,9 @@ public class CarBehaviour extends CyclicBehaviour
 		{
 			takeStep(currentDirection);
         }
+		if(canTakeStep())
+			takeStep(currentDirection);
+		else{
 		if(new String(nextAgent.type).equals("intersection"))
 		{
 			
@@ -105,8 +108,10 @@ public class CarBehaviour extends CyclicBehaviour
 				currentDirection=GetRandomDirection(currentDirection);
 				x0=nextAgent.x;
 				y0=nextAgent.y;
-				takeStep(currentDirection);
+				takeUnitStep(currentDirection);
 				startTime=System.currentTimeMillis();
+				block();
+				
 			}
         }
 		if(new String(nextAgent.type).equals("car"))
@@ -120,6 +125,7 @@ public class CarBehaviour extends CyclicBehaviour
 				mode="stop";
 			}
 		}
+		}
 	}
 	public boolean canTakeStep()
 	{
@@ -127,16 +133,16 @@ public class CarBehaviour extends CyclicBehaviour
 		switch(currentDirection)
 		{
 			case "north":
-				canTakeStep=((nextAgent.y - y)>5);
+				canTakeStep=((nextAgent.y - y)>2);
 				break;		
 			case "south":
-				canTakeStep=((nextAgent.y - y)<-5);
+				canTakeStep=((nextAgent.y - y)<-2);
 				break;
 			case "east":
-				canTakeStep=((nextAgent.x - x)>5);
+				canTakeStep=((nextAgent.x - x)>2);
 				break;
 			case "west":
-				canTakeStep=((nextAgent.x - x)<-5);
+				canTakeStep=((nextAgent.x - x)<-2);
 				break;
 			default:
 			break;
@@ -197,11 +203,11 @@ return canTakeStep;
 			System.out.println("STRING LIST ELEMENTS:" + str);
 		}
 		AgentClass agent=new AgentClass();
-		agent.type=stringList[9];
-		agent.x=Double.parseDouble(stringList[10]);
-		agent.y=Double.parseDouble(stringList[11]);
-		agent.direction=stringList[12];
-		agent.lightColor=stringList[13];
+		agent.type=stringList[0];
+		agent.x=Double.parseDouble(stringList[1]);
+		agent.y=Double.parseDouble(stringList[2]);
+		agent.direction=stringList[3];
+		agent.lightColor=stringList[4];
 		//agent.name=message.getSender().getLocalName();
 		//agent.aid=message.getSender();
 		return agent;
@@ -240,6 +246,27 @@ return canTakeStep;
 			x = x0 - v*0.001*(measureTime-startTime);
 		}
 	}
+	void takeUnitStep(String currentDirection)
+	{
+		measureTime = System.currentTimeMillis();
+		
+		if (currentDirection == "north")
+		{
+			y =y0 + 1;
+		}
+		if (currentDirection == "south")
+		{
+			y =y0 - 1;
+		}
+		if (currentDirection == "east")
+		{
+			x = x0 + 1;
+		}
+		if (currentDirection == "west")
+		{
+			x = x0 - 1;
+		}
+	}
 		
 	void makePlaceForAmbulance(String currentDirection)
 	{
@@ -264,17 +291,28 @@ return canTakeStep;
 	}
 	void stop()
 	{
-		//send queryIf
-		ArrayList<ACLMessage> msgs=new ArrayList<ACLMessage>();
-		msgs = ReceiveMessages(requestMessage);
 		try
 		{
-			msgs = ReceiveMessages(requestMessage);
+			TimeUnit.MILLISECONDS.sleep(200);
 		}
 		catch(Exception ex)
 		{
 			
 		}
+		x0=x;
+		y0=y;
+		startTime=System.currentTimeMillis();
+		mode="run";
+		//ArrayList<ACLMessage> msgs=new ArrayList<ACLMessage>();
+		//msgs = ReceiveMessages(requestMessage);
+		//try
+		//{
+		//	msgs = ReceiveMessages(requestMessage);
+		//}
+		//catch(Exception ex)
+		//{
+			
+		//}
 		//if(msgs!=null && ParseAgent(msgs.get(1).getContent()).ambulance==null)
 		//{
 		//	x=x0;
@@ -309,14 +347,21 @@ return canTakeStep;
 	public void sendStatusMessage()
 	{
 		ACLMessage msg = new ACLMessage( ACLMessage.INFORM );
-		msg.setContent(myAgent.getAID() +" car "+ x +" "+y +" "+currentDirection + " null");
+		msg.setContent("car "+ x +" "+y +" "+currentDirection + " null");
 		msg.addReceiver(trafficManagerAID);
 		myAgent.send(msg);
 	}
 	public void sendRequestMessage()
 	{
-		ACLMessage msg = new ACLMessage( ACLMessage.REQUEST);
-		msg.setContent(myAgent.getAID() +" car "+ x +" "+y +" "+currentDirection + " null");
+		ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
+		msg.setContent("car "+ x +" "+y +" "+currentDirection + " null");
+		msg.addReceiver(trafficManagerAID);
+		myAgent.send(msg);
+	}
+	public void sendQueryIFMessage()
+	{
+		ACLMessage msg = new ACLMessage( ACLMessage.QUERY_IF);
+		msg.setContent("car "+ x +" "+y +" "+currentDirection + " null");
 		msg.addReceiver(trafficManagerAID);
 		myAgent.send(msg);
 	}
