@@ -61,6 +61,9 @@ public class CarBehaviour extends CyclicBehaviour
 	{ // funkcja do poruszania się samochodu
 		tempTime=System.currentTimeMillis();
 		measureTime=System.currentTimeMillis();
+		sendStatusMessage();
+		nextAgent=getNextAgent();
+		System.out.println("moved on" + mode + " nextAgent type" + nextAgent.type);
 		while((measureTime-tempTime)<1000)
 		{
 	    boolean isAmbulance = isNeedToMakePlaceForAmbulance(x,y,currentDirection); // w kazdej chwili pytamy managera ruchu czy trzeba stanąc na bok i sie zatrzymac bo jedzie ambulans
@@ -79,15 +82,12 @@ public class CarBehaviour extends CyclicBehaviour
 	    }
 		measureTime=System.currentTimeMillis();
 		}
-		sendStatusMessage();
 	}
 	
 	
 	public void move()
 	{
-		//nextAgent=getNextAgent(x,y,currentDirection);
-		AgentClass nextAgent= new AgentClass();
-		nextAgent.type="none";
+		
 		if(new String(nextAgent.type).equals("none"))
 		{
 			takeStep(currentDirection);
@@ -95,11 +95,11 @@ public class CarBehaviour extends CyclicBehaviour
 		if(new String(nextAgent.type).equals("intersection"))
 		{
 			
-			if(nextAgent.lightColor=="red")
+			if(new String(nextAgent.lightColor).equals("red"))
 			{
 				mode="stop";
 			}
-			if(nextAgent.lightColor=="green")
+			if(new String(nextAgent.lightColor).equals("green"))
 			{
 				mode="run";
 				currentDirection=GetRandomDirection(currentDirection);
@@ -111,7 +111,7 @@ public class CarBehaviour extends CyclicBehaviour
         }
 		if(new String(nextAgent.type).equals("car"))
 		{
-			if(Math.abs(nextAgent.x - x)>10)
+			if(canTakeStep())
 			{
 				takeStep(currentDirection);
 			}
@@ -121,6 +121,29 @@ public class CarBehaviour extends CyclicBehaviour
 			}
 		}
 	}
+	public boolean canTakeStep()
+	{
+		boolean canTakeStep=false;
+		switch(currentDirection)
+		{
+			case "north":
+				canTakeStep=((nextAgent.y - y)>5);
+				break;		
+			case "south":
+				canTakeStep=((nextAgent.y - y)<-5);
+				break;
+			case "east":
+				canTakeStep=((nextAgent.x - x)>5);
+				break;
+			case "west":
+				canTakeStep=((nextAgent.x - x)<-5);
+				break;
+			default:
+			break;
+		}			
+return canTakeStep;
+	}		
+
 	public String GetRandomDirection(String currentDirection)
 	{
 		String newDirection=currentDirection;
@@ -149,28 +172,38 @@ public class CarBehaviour extends CyclicBehaviour
 	
 	
 	
-	public AgentClass getNextAgent(double x,double y,String currentDirection)
+	public AgentClass getNextAgent()
 	{
-		//implement message query-inform and wait for response.
-		//SendQueryInformMessage();
-		//Change to response
-		ACLMessage msg = myAgent.receive(requestMessage);
+		sendRequestMessage();
+		System.out.println("Request sent");
+		ACLMessage msg = myAgent.receive(informMessage);
 		while(msg==null)
 		{
-			msg=myAgent.receive(requestMessage);
+			msg=myAgent.receive(informMessage);
 		}
-		return ParseAgent(msg.getContent());
+		System.out.println("Response received");
+		
+		return ParseAgent(msg);
 		
 	}
 	
-	public AgentClass ParseAgent(String content)
+	public AgentClass ParseAgent(ACLMessage message)
 	{
+		String content=message.getContent();
+		//System.out.println("CONTENT=" +content);
 		String[] stringList = content.split(" ");
+		for(String str:stringList)
+		{
+			System.out.println("STRING LIST ELEMENTS:" + str);
+		}
 		AgentClass agent=new AgentClass();
-		agent.type=stringList[0];
-		agent.x=Double.parseDouble(stringList[1]);
-		agent.y=Double.parseDouble(stringList[2]);
-		agent.lightColor=stringList[3];
+		agent.type=stringList[9];
+		agent.x=Double.parseDouble(stringList[10]);
+		agent.y=Double.parseDouble(stringList[11]);
+		agent.direction=stringList[12];
+		agent.lightColor=stringList[13];
+		//agent.name=message.getSender().getLocalName();
+		//agent.aid=message.getSender();
 		return agent;
 	}
 	
@@ -276,6 +309,13 @@ public class CarBehaviour extends CyclicBehaviour
 	public void sendStatusMessage()
 	{
 		ACLMessage msg = new ACLMessage( ACLMessage.INFORM );
+		msg.setContent(myAgent.getAID() +" car "+ x +" "+y +" "+currentDirection + " null");
+		msg.addReceiver(trafficManagerAID);
+		myAgent.send(msg);
+	}
+	public void sendRequestMessage()
+	{
+		ACLMessage msg = new ACLMessage( ACLMessage.REQUEST);
 		msg.setContent(myAgent.getAID() +" car "+ x +" "+y +" "+currentDirection + " null");
 		msg.addReceiver(trafficManagerAID);
 		myAgent.send(msg);

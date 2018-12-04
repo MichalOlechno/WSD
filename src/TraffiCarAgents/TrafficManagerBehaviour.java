@@ -63,24 +63,20 @@ public class TrafficManagerBehaviour extends CyclicBehaviour
 		{
 			//HandleAmbulance();
 		}
-		//GetCarsRequests();
+		HandleCarsRequests();
 		currentTime=System.currentTimeMillis();
 		}
 		System.out.println("TrafficManager lives, agent size ="+agents.size());
 		SaveAgentsStates();
 	}
 	
-	public void sendMessageToCarAgent(AID carAID, String type,int x,int y)
+	public void sendMessageToCarAgent(AgentClass carAgent,AgentClass requestedAgent)
 	{
-		ACLMessage msg = new ACLMessage( ACLMessage.REQUEST );
-		msg.setContent("CHANGE STATUS");
-		
-		for (int i = 0; i < carAgents.length; ++i)
-		{
-			msg.addReceiver(carAgents[i]);
-		}
+		ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+		msg.setContent(requestedAgent.aid +" "+ requestedAgent.type + " " + requestedAgent.x +" "+requestedAgent.y +" "+requestedAgent.direction + " null");
+		msg.addReceiver(carAgent.aid);
 		myAgent.send(msg);
-		
+		System.out.println("message sent to" + carAgent.aid);
 	}
 	public DFAgentDescription setTemplate(DFAgentDescription template,String AgentType)
 	{
@@ -167,7 +163,102 @@ public class TrafficManagerBehaviour extends CyclicBehaviour
 		agent.direction=stringList[12];
 		agent.lightColor=stringList[13];
 		agent.name=message.getSender().getLocalName();
+		agent.aid=message.getSender();
 		return agent;
+	}
+	public void HandleCarsRequests()
+	{
+		ArrayList<ACLMessage> messages=GetMessages(requestMessage);
+		ArrayList<AgentClass> carAgents=GetAgentsFromMessage(messages);
+		AgentClass tempAgent;
+		for(AgentClass carAgent:carAgents)
+		{
+			System.out.println("someCar");	
+			double value=1000;
+			AgentClass requestingAgent=new AgentClass();
+			requestingAgent.type="none";
+			requestingAgent.x=carAgent.x;
+			requestingAgent.y=carAgent.y;
+			requestingAgent.direction=carAgent.direction;
+			requestingAgent.lightColor=carAgent.lightColor;
+			
+			for(AgentClass agent:agents)
+			{
+				if(new String(carAgent.direction).equals(agent.direction))
+				{
+					tempAgent=calculateRelevantDistance(carAgent,agent,value);
+					if(tempAgent!=null)
+						requestingAgent=tempAgent;
+				}
+			}
+			sendMessageToCarAgent(carAgent,requestingAgent);
+			
+		}	
+	}
+	public AgentClass calculateRelevantDistance(AgentClass carAgent,AgentClass agent,double value)
+	{
+		double temp;
+		if(((new String(agent.direction).equals("north")) || (new String(agent.direction).equals("null"))) &&  carAgent.x==agent.x)
+		{
+			if(agent.y >carAgent.y && (agent.y - carAgent.y)<value)
+			{
+				value=(agent.y - carAgent.y);
+				return agent;
+			}
+		}
+		if(((new String(agent.direction).equals("south")) || (new String(agent.direction).equals("null"))) &&  carAgent.x==agent.x)
+		{
+			if(agent.y <carAgent.y && (carAgent.y - agent.y)<value)
+			{
+				value=(carAgent.y - agent.y);
+				return agent;
+			}
+		}
+		if(((new String(agent.direction).equals("east")) || (new String(agent.direction).equals("null"))) &&  carAgent.y==agent.y)
+		{
+			if(agent.x >carAgent.x && (agent.x - carAgent.x)<value)
+			{
+				value= (agent.x - carAgent.x);
+				return agent;
+			}
+		}
+		if(((new String(agent.direction).equals("west")) || (new String(agent.direction).equals("null"))) &&  carAgent.y==agent.y)
+		{
+			if(agent.x <carAgent.x && (carAgent.x - agent.x)<value)
+			{
+				value= (carAgent.x - agent.x);
+				return agent;
+			}
+		}
+		return null;
+		
+	}
+	
+	public ArrayList<AgentClass> GetAgentsFromMessage(ArrayList<ACLMessage> messages)
+	{
+		ArrayList<AgentClass> carAgents=new ArrayList<AgentClass>();
+		boolean isNewElement=true;
+		for(ACLMessage message:messages)
+		{
+			for(int i=0;i<carAgents.size();i++)
+			{
+
+				if(new String(carAgents.get(i).name).equals(message.getSender().getLocalName()))
+				{
+					carAgents.set(i,ParseAgent(message));
+					
+					isNewElement=false;
+					break;
+				}
+			}
+			if(isNewElement)
+			{
+				carAgents.add(ParseAgent(message));
+				//System.out.println("Added");
+			}
+			isNewElement=true;
+		}
+		return carAgents;
 	}
 	
 	public void SaveAgentsStates()

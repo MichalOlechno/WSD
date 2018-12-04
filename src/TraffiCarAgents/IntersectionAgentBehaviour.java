@@ -22,7 +22,7 @@ public class IntersectionAgentBehaviour extends CyclicBehaviour
 	private long startTime;
 	private long tempTime;
 	private long currentTime;
-	private long lightChangingRatio=5000;
+	private long lightChangingRatio=500000;
 	private AID trafficManagerAID;
 	
 	public IntersectionAgentBehaviour(Agent a,double X,double Y) 
@@ -30,7 +30,7 @@ public class IntersectionAgentBehaviour extends CyclicBehaviour
 		super(a);
 		x=X;
 		y=Y;
-		lightColor="green";
+		lightColor="red";
 		trafficManagerTemplate = new DFAgentDescription();
 		trafficManagerTemplate=setTemplate(trafficManagerTemplate,"TrafficManager");
 		requestMessage=MessageTemplate.MatchPerformative(ACLMessage.REQUEST);

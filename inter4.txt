@@ -1,0 +1,10 @@
+14.192 intersection 10.0 0.0 null red
+16.21 intersection 10.0 0.0 null red
+18.226 intersection 10.0 0.0 null red
+20.241 intersection 10.0 0.0 null red
+22.26 intersection 10.0 0.0 null red
+24.273 intersection 10.0 0.0 null red
+26.278 intersection 10.0 0.0 null red
+28.289 intersection 10.0 0.0 null red
+30.293 intersection 10.0 0.0 null red
+32.302 intersection 10.0 0.0 null red

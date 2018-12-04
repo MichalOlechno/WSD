@@ -5,6 +5,7 @@ import jade.core.behaviours.*;
 
 public class AgentClass
 {
+	public AID aid;
 	public String name;
 	public String type;
 	public double x;
