@@ -1,0 +1,6 @@
+56.345 intersection 10.0 0.0 null green
+58.352 intersection 10.0 0.0 null green
+60.357 intersection 10.0 0.0 null green
+62.362 intersection 10.0 0.0 null red
+64.366 intersection 10.0 0.0 null red
+66.37 intersection 10.0 0.0 null red

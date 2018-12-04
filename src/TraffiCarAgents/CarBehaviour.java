@@ -30,8 +30,10 @@ public class CarBehaviour extends CyclicBehaviour
 	private MessageTemplate requestMessage;
 	private MessageTemplate informMessage;
 	private long startTime;
+	private long tempTime;
 	private long measureTime;	
 	private double v;
+	private AID trafficManagerAID;
 	private boolean messageSent=false;
 	
 	public CarBehaviour(Agent a,double X,double Y,String CurrentDirection)
@@ -48,6 +50,7 @@ public class CarBehaviour extends CyclicBehaviour
 		lightColor="green";
 		trafficManagerTemplate = new DFAgentDescription();
 		trafficManagerTemplate=setTemplate(trafficManagerTemplate,"TrafficManager");
+		trafficManagerAID=GetAgents(trafficManagerTemplate)[0];
 		requestMessage=MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
 		informMessage=MessageTemplate.MatchPerformative(ACLMessage.INFORM);
 		startTime = System.currentTimeMillis();
@@ -56,6 +59,10 @@ public class CarBehaviour extends CyclicBehaviour
 		
 	public void action()
 	{ // funkcja do poruszania się samochodu
+		tempTime=System.currentTimeMillis();
+		measureTime=System.currentTimeMillis();
+		while((measureTime-tempTime)<1000)
+		{
 	    boolean isAmbulance = isNeedToMakePlaceForAmbulance(x,y,currentDirection); // w kazdej chwili pytamy managera ruchu czy trzeba stanąc na bok i sie zatrzymac bo jedzie ambulans
 	    if (isAmbulance == true)
 	    { 											// gdy jest ambulans, zjeżdzamy z drogi
@@ -70,16 +77,22 @@ public class CarBehaviour extends CyclicBehaviour
 	    {
 	    	stop();
 	    }
+		measureTime=System.currentTimeMillis();
+		}
+		sendStatusMessage();
 	}
+	
 	
 	public void move()
 	{
-		nextAgent=getNextAgent(x,y,currentDirection);
-		if(nextAgent.type == null) 
+		//nextAgent=getNextAgent(x,y,currentDirection);
+		AgentClass nextAgent= new AgentClass();
+		nextAgent.type="none";
+		if(new String(nextAgent.type).equals("none"))
 		{
 			takeStep(currentDirection);
         }
-		if(nextAgent.type == "intersection") 
+		if(new String(nextAgent.type).equals("intersection"))
 		{
 			
 			if(nextAgent.lightColor=="red")
@@ -96,7 +109,7 @@ public class CarBehaviour extends CyclicBehaviour
 				startTime=System.currentTimeMillis();
 			}
         }
-		if(nextAgent.type == "car")
+		if(new String(nextAgent.type).equals("car"))
 		{
 			if(Math.abs(nextAgent.x - x)>10)
 			{
@@ -260,6 +273,13 @@ public class CarBehaviour extends CyclicBehaviour
 		}
 		return msgs;
 	}
+	public void sendStatusMessage()
+	{
+		ACLMessage msg = new ACLMessage( ACLMessage.INFORM );
+		msg.setContent(myAgent.getAID() +" car "+ x +" "+y +" "+currentDirection + " null");
+		msg.addReceiver(trafficManagerAID);
+		myAgent.send(msg);
+	}
 	public DFAgentDescription setTemplate(DFAgentDescription template,String AgentType)
 	{
 		ServiceDescription sd = new ServiceDescription();
@@ -267,4 +287,23 @@ public class CarBehaviour extends CyclicBehaviour
 		template.addServices(sd);
 		return template;
 	}		
+	public AID[] GetAgents(DFAgentDescription template)
+	{
+		try
+		{
+			DFAgentDescription[] result = DFService.search(myAgent, template); 
+			if(result==null)
+				return new AID[0];
+			AID[] tempAgents = new AID[result.length];
+			for (int i = 0; i < result.length; ++i)
+			{
+				tempAgents[i] = result[i].getName();	
+			}
+			return tempAgents;
+		}
+		catch(FIPAException fe)
+		{
+			return null;
+		}
+	}
 }

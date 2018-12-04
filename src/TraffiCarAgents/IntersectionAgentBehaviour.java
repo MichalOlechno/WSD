@@ -23,6 +23,7 @@ public class IntersectionAgentBehaviour extends CyclicBehaviour
 	private long tempTime;
 	private long currentTime;
 	private long lightChangingRatio=5000;
+	private AID trafficManagerAID;
 	
 	public IntersectionAgentBehaviour(Agent a,double X,double Y) 
 	{
@@ -35,6 +36,8 @@ public class IntersectionAgentBehaviour extends CyclicBehaviour
 		requestMessage=MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
 		informMessage=MessageTemplate.MatchPerformative(ACLMessage.INFORM);
 		startTime = System.currentTimeMillis();
+		trafficManagerAID=GetAgents(trafficManagerTemplate)[0];
+		
 	}
 	public void action()
 	{
@@ -43,7 +46,7 @@ public class IntersectionAgentBehaviour extends CyclicBehaviour
 		while((currentTime-startTime)<lightChangingRatio)
 		{
 			tempTime=System.currentTimeMillis();
-			while((currentTime-tempTime)<500)
+			while((currentTime-tempTime)<1000)
 			{
 				//ACLMessage msg = ReceiveRequestMessage
 				ACLMessage msg =null;
@@ -54,11 +57,19 @@ public class IntersectionAgentBehaviour extends CyclicBehaviour
 				}
 				currentTime=System.currentTimeMillis();
 			}
-			//sendStatusMessage
+			sendStatusMessage();
 			currentTime=System.currentTimeMillis();
 		}
 		changeLights();
 	}
+	public void sendStatusMessage()
+	{
+		ACLMessage msg = new ACLMessage( ACLMessage.INFORM );
+		msg.setContent(myAgent.getAID() +" intersection "+ x +" "+y +" null "+lightColor);
+		msg.addReceiver(trafficManagerAID);
+		myAgent.send(msg);
+	}
+	
 	
 	public void changeLights()
 	{
@@ -66,6 +77,25 @@ public class IntersectionAgentBehaviour extends CyclicBehaviour
 			lightColor="green";
 		else
 			lightColor="red";
+	} 
+	public AID[] GetAgents(DFAgentDescription template)
+	{
+		try
+		{
+			DFAgentDescription[] result = DFService.search(myAgent, template); 
+			if(result==null)
+				return new AID[0];
+			AID[] tempAgents = new AID[result.length];
+			for (int i = 0; i < result.length; ++i)
+			{
+				tempAgents[i] = result[i].getName();	
+			}
+			return tempAgents;
+		}
+		catch(FIPAException fe)
+		{
+			return null;
+		}
 	}
 	public DFAgentDescription setTemplate(DFAgentDescription template,String AgentType)
 	{

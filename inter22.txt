@@ -1,0 +1,10 @@
+28.107 intersection 10.0 0.0 green
+30.112 intersection 10.0 0.0 green
+32.119 intersection 10.0 0.0 red
+34.125 intersection 10.0 0.0 red
+36.129 intersection 10.0 0.0 red
+38.136 intersection 10.0 0.0 green
+40.14 intersection 10.0 0.0 green
+42.145 intersection 10.0 0.0 red
+44.15 intersection 10.0 0.0 red
+46.155 intersection 10.0 0.0 red

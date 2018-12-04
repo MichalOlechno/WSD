@@ -1,0 +1,12 @@
+44.318 car 0.0 1.0 north null
+46.322 car 0.0 2.999 north null
+48.325 car 0.0 5.0 north null
+50.333 car 0.0 6.9990000000000006 north null
+52.338 car 0.0 9.0 north null
+54.341 car 0.0 11.0 north null
+56.345 car 0.0 12.999 north null
+58.352 car 0.0 14.999 north null
+60.357 car 0.0 17.0 north null
+62.362 car 0.0 19.0 north null
+64.366 car 0.0 20.999 north null
+66.37 car 0.0 21.999 north null

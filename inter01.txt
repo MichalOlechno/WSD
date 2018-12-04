@@ -1,0 +1,16 @@
+16258 intersection 10.0 0.0 green
+18264 intersection 10.0 0.0 green
+20269 intersection 10.0 0.0 red
+22275 intersection 10.0 0.0 red
+24279 intersection 10.0 0.0 red
+26288 intersection 10.0 0.0 green
+28292 intersection 10.0 0.0 green
+30296 intersection 10.0 0.0 red
+32300 intersection 10.0 0.0 red
+34304 intersection 10.0 0.0 red
+36308 intersection 10.0 0.0 green
+38314 intersection 10.0 0.0 green
+40320 intersection 10.0 0.0 red
+42324 intersection 10.0 0.0 red
+44328 intersection 10.0 0.0 red
+46332 intersection 10.0 0.0 green

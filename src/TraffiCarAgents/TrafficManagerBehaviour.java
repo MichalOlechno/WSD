@@ -32,6 +32,7 @@ public class TrafficManagerBehaviour extends CyclicBehaviour
 	private long startTime;
 	private long tempTime;
 	private long currentTime;
+	private double writeTime;
 	
 	public TrafficManagerBehaviour(Agent a) 
 	{
@@ -46,16 +47,16 @@ public class TrafficManagerBehaviour extends CyclicBehaviour
 		informMessage=MessageTemplate.MatchPerformative(ACLMessage.INFORM);
 		informIfMessage=MessageTemplate.MatchPerformative(ACLMessage.INFORM_IF);
 		startTime = System.currentTimeMillis();
+		agents=new ArrayList<AgentClass>();
 	}
 	public void action()
 	{
 		carAgents=GetAgents(carTemplate);
 		intersectionAgents=GetAgents(intersectionTemplate);
 		ambulanceAgents=GetAgents(ambulanceTemplate);
-		agents=new ArrayList<AgentClass>();
 		tempTime=System.currentTimeMillis();
 		currentTime=System.currentTimeMillis();
-		while((currentTime-tempTime)<1000)
+		while((currentTime-tempTime)<2000)
 		{
 		agents=ReceiveAgentState();
 		if(ambulanceAgents!=null)
@@ -65,7 +66,7 @@ public class TrafficManagerBehaviour extends CyclicBehaviour
 		//GetCarsRequests();
 		currentTime=System.currentTimeMillis();
 		}
-		
+		System.out.println("TrafficManager lives, agent size ="+agents.size());
 		SaveAgentsStates();
 	}
 	
@@ -90,22 +91,45 @@ public class TrafficManagerBehaviour extends CyclicBehaviour
 	}
 	public ArrayList<AgentClass> ReceiveAgentState()
 	{
-		//ReceiveInformMessages
-		ArrayList<ACLMessage> messages = new ArrayList<ACLMessage>();
+		ArrayList<ACLMessage> messages = GetMessages(informMessage);
+		boolean isNewElement=true;
 		for(ACLMessage message:messages)
 		{
+			
 			for(int i=0;i<agents.size();i++)
 			{
-				if(agents.get(i+1).aid==message.getSender())
+
+				if(new String(agents.get(i).name).equals(message.getSender().getLocalName()))
 				{
-					agents.set(i+1,ParseAgent(message.getContent()));
+					//System.out.println("Existing agent in list i=" +i);
+					agents.set(i,ParseAgent(message));
+					
+					isNewElement=false;
 					break;
-				}	
+				}
 			}
+			if(isNewElement)
+			{
+				agents.add(ParseAgent(message));
+				//System.out.println("Added");
+			}
+			isNewElement=true;
 		}
 		return agents;
 	}
-	
+	public ArrayList<ACLMessage> GetMessages(MessageTemplate template)
+	{
+		ArrayList<ACLMessage> messages = new ArrayList<ACLMessage>();
+		ACLMessage msg = myAgent.receive(template);
+		
+		while(msg!=null)
+		{
+			//System.out.println("TrafficManager gets a message !!!");
+			messages.add(msg);
+			msg=myAgent.receive(requestMessage);
+		}
+		return messages;
+	}
 
 	public AID[] GetAgents(DFAgentDescription template)
 	{
@@ -127,27 +151,37 @@ public class TrafficManagerBehaviour extends CyclicBehaviour
 		}
 	}
 	
-	public AgentClass ParseAgent(String content)
+	public AgentClass ParseAgent(ACLMessage message)
 	{
+		String content=message.getContent();
+		//System.out.println("CONTENT=" +content);
 		String[] stringList = content.split(" ");
+		//for(String str:stringList)
+		//{
+		//	System.out.println("STRING LIST ELEMENTS:" + str);
+		//}
 		AgentClass agent=new AgentClass();
-		agent.type=stringList[0];
-		agent.x=Double.parseDouble(stringList[1]);
-		agent.y=Double.parseDouble(stringList[2]);
-		agent.lightColor=stringList[3];
+		agent.type=stringList[9];
+		agent.x=Double.parseDouble(stringList[10]);
+		agent.y=Double.parseDouble(stringList[11]);
+		agent.direction=stringList[12];
+		agent.lightColor=stringList[13];
+		agent.name=message.getSender().getLocalName();
 		return agent;
 	}
 	
 	public void SaveAgentsStates()
 	{
+		writeTime=(double)((System.currentTimeMillis()-startTime))/1000;
 		for(AgentClass agent:agents)
 		{
 			try
 			{
-				PrintWriter outputStream=new PrintWriter(new FileOutputStream((agent.aid.getName() +".txt"), true));
+				PrintWriter outputStream=new PrintWriter(new FileOutputStream((agent.name +".txt"), true));
+				//System.out.println("File names:" +agent.name);
 				if(outputStream!=null)
 				{			
-					outputStream.println(agent.type +" "+agent.x +" "+agent.y +" "+agent.lightColor);
+					outputStream.println(writeTime +" " + agent.type +" "+agent.x +" "+agent.y +" "+agent.direction +" "+agent.lightColor);
 				}
 				outputStream.close();
 			}
