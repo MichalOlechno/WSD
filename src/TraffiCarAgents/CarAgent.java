@@ -36,6 +36,12 @@ public class CarAgent extends Agent {
 		catch (FIPAException fe) {
 			fe.printStackTrace();
 		}
+		
+		
+		Object[] objects =getArguments();
+		x=Double.parseDouble((String)objects[0]);
+		y=Double.parseDouble((String)objects[1]);
+		GetNode();
 		 CarBehaviour carBehaviour = new CarBehaviour(this,x,y,currentDirection);
 			addBehaviour(carBehaviour);
 		 
@@ -45,6 +51,17 @@ public class CarAgent extends Agent {
 	protected void takeDown() {
 	    // Printout a dismissal message
 	    System.out.println("CarAgent "+getAID().getName()+" terminating.");
-	  }
+	}
 	
+	void GetNode()
+	{
+		if(x==0 && y==20)
+			currentDirection="east";
+		else if(y>20 && ( x==20 || x==40))
+			currentDirection="south";
+		else if(y<20 && ( x==20 || x==40))
+			currentDirection="north";
+		else
+			currentDirection="west";		
+	}
 }

@@ -64,7 +64,7 @@ public class CarBehaviour extends CyclicBehaviour
 		measureTime=System.currentTimeMillis();
 		sendStatusMessage();
 		nextAgent=getNextAgent();
-		while((measureTime-tempTime)<1000)
+		while((measureTime-tempTime)<500)
 		{
 	    boolean isAmbulance = isNeedToMakePlaceForAmbulance(x,y,currentDirection); // w kazdej chwili pytamy managera ruchu czy trzeba stanąc na bok i sie zatrzymac bo jedzie ambulans
 	    if (isAmbulance == true)
@@ -98,22 +98,39 @@ public class CarBehaviour extends CyclicBehaviour
 		if(new String(nextAgent.type).equals("intersection"))
 		{
 			
-			if(new String(nextAgent.lightColor).equals("red"))
+			if(((new String(nextAgent.lightColor).equals("red")) && ((new String(currentDirection).equals("north")) || (new String(currentDirection).equals("south"))))
+				|| ((new String(nextAgent.lightColor).equals("green")) && ((new String(currentDirection).equals("east")) || (new String(currentDirection).equals("west")))))
 			{
 				mode="stop";
 			}
-			if(new String(nextAgent.lightColor).equals("green"))
+			if(((new String(nextAgent.lightColor).equals("green")) && ((new String(currentDirection).equals("north")) || (new String(currentDirection).equals("south"))))
+				|| ((new String(nextAgent.lightColor).equals("red")) && ((new String(currentDirection).equals("east")) || (new String(currentDirection).equals("west")))))
 			{
+				if(canTakeStep())
+					takeStep(currentDirection);
+				else{
 				mode="run";
 				currentDirection=GetRandomDirection(currentDirection);
 				x0=nextAgent.x;
 				y0=nextAgent.y;
-				takeUnitStep(currentDirection);
+				x=x0;
+				y=y0;
+				System.out.println("next agent x= "+nextAgent.x);
+				System.out.println("next agent y= "+nextAgent.y);
 				startTime=System.currentTimeMillis();
-				block();
-				
+				sendStatusMessage();
+				try
+			{
+				TimeUnit.MILLISECONDS.sleep(500);
 			}
-        }
+			catch(Exception ex)
+			{
+			
+			}
+				nextAgent=getNextAgent();
+				}
+			}
+		}
 		if(new String(nextAgent.type).equals("car"))
 		{
 			if(canTakeStep())
@@ -133,16 +150,16 @@ public class CarBehaviour extends CyclicBehaviour
 		switch(currentDirection)
 		{
 			case "north":
-				canTakeStep=((nextAgent.y - y)>2);
+				canTakeStep=((nextAgent.y - y)>0.5);
 				break;		
 			case "south":
-				canTakeStep=((nextAgent.y - y)<-2);
+				canTakeStep=((nextAgent.y - y)<-0.5);
 				break;
 			case "east":
-				canTakeStep=((nextAgent.x - x)>2);
+				canTakeStep=((nextAgent.x - x)>0.5);
 				break;
 			case "west":
-				canTakeStep=((nextAgent.x - x)<-2);
+				canTakeStep=((nextAgent.x - x)<-0.5);
 				break;
 			default:
 			break;
@@ -244,27 +261,6 @@ return canTakeStep;
 		if (currentDirection == "west")
 		{
 			x = x0 - v*0.001*(measureTime-startTime);
-		}
-	}
-	void takeUnitStep(String currentDirection)
-	{
-		measureTime = System.currentTimeMillis();
-		
-		if (currentDirection == "north")
-		{
-			y =y0 + 1;
-		}
-		if (currentDirection == "south")
-		{
-			y =y0 - 1;
-		}
-		if (currentDirection == "east")
-		{
-			x = x0 + 1;
-		}
-		if (currentDirection == "west")
-		{
-			x = x0 - 1;
 		}
 	}
 		

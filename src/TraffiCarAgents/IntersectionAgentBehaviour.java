@@ -22,7 +22,7 @@ public class IntersectionAgentBehaviour extends CyclicBehaviour
 	private long startTime;
 	private long tempTime;
 	private long currentTime;
-	private long lightChangingRatio=30000;
+	private long lightChangingRatio=50000;
 	private AID trafficManagerAID;
 	
 	public IntersectionAgentBehaviour(Agent a,double X,double Y) 
@@ -46,7 +46,7 @@ public class IntersectionAgentBehaviour extends CyclicBehaviour
 		while((currentTime-startTime)<lightChangingRatio)
 		{
 			tempTime=System.currentTimeMillis();
-			while((currentTime-tempTime)<1000)
+			while((currentTime-tempTime)<500)
 			{
 				//ACLMessage msg = ReceiveRequestMessage
 				ACLMessage msg =null;

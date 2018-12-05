@@ -33,6 +33,7 @@ public class TrafficManagerBehaviour extends CyclicBehaviour
 	private long tempTime;
 	private long currentTime;
 	private double writeTime;
+	private double value;
 	
 	public TrafficManagerBehaviour(Agent a) 
 	{
@@ -56,7 +57,7 @@ public class TrafficManagerBehaviour extends CyclicBehaviour
 		ambulanceAgents=GetAgents(ambulanceTemplate);
 		tempTime=System.currentTimeMillis();
 		currentTime=System.currentTimeMillis();
-		while((currentTime-tempTime)<2000)
+		while((currentTime-tempTime)<1000)
 		{
 		agents=ReceiveAgentState();
 		if(ambulanceAgents!=null)
@@ -171,10 +172,11 @@ public class TrafficManagerBehaviour extends CyclicBehaviour
 		ArrayList<ACLMessage> messages=GetMessages(requestMessage);
 		ArrayList<AgentClass> carAgents=GetAgentsFromMessage(messages);
 		AgentClass tempAgent;
+
 		for(AgentClass carAgent:carAgents)
 		{
 			System.out.println("someCar");	
-			double value=1000;
+			value=1000;
 			AgentClass requestingAgent=new AgentClass();
 			requestingAgent.type="none";
 			requestingAgent.x=carAgent.x;
@@ -186,47 +188,61 @@ public class TrafficManagerBehaviour extends CyclicBehaviour
 			{
 				if((new String(carAgent.direction).equals(agent.direction)) || (new String(agent.direction).equals("null")))
 				{
-					tempAgent=calculateRelevantDistance(carAgent,agent,value);
+					tempAgent=calculateRelevantDistance(carAgent,agent);
 					System.out.println("agent type=" + agent.type +" x= " + agent.x + " y=" + agent.y + " direction " + agent.direction);
+					System.out.println("agent type=" + carAgent.type +" x= " + carAgent.x + " y=" + carAgent.y + " direction " + carAgent.direction);
 					if(tempAgent!=null)
+					{
+						System.out.println("Agent set. value = " + value);
 						requestingAgent=tempAgent;
+					}
 				}
 			}
 			sendMessageToCarAgent(carAgent,requestingAgent);
 			
 		}	
 	}
-	public AgentClass calculateRelevantDistance(AgentClass carAgent,AgentClass agent,double value)
+	public AgentClass calculateRelevantDistance(AgentClass carAgent,AgentClass agent)
 	{
-		double temp;
-		if(((new String(agent.direction).equals("north")) || (new String(agent.direction).equals("null"))) &&  carAgent.x==agent.x)
+		if(((new String(carAgent.direction).equals("north")) &&  carAgent.x==agent.x))
 		{
-			if(agent.y >carAgent.y && (agent.y - carAgent.y)<value)
+			if((agent.y >carAgent.y) && (agent.y - carAgent.y)<value)
 			{
+				if((new String(agent.direction).equals("null")) && (agent.y==carAgent.y))
+					return null;
+				System.out.println("Why it came here agent.y= " + agent.y + " and agent.y-carAgent.y = " + (agent.y >carAgent.y) );
 				value=(agent.y - carAgent.y);
 				return agent;
 			}
 		}
-		if(((new String(agent.direction).equals("south")) || (new String(agent.direction).equals("null"))) &&  carAgent.x==agent.x)
+		if(((new String(carAgent.direction).equals("south")) && carAgent.x==agent.x))
 		{
-			if(agent.y <carAgent.y && (carAgent.y - agent.y)<value)
+			if((agent.y <carAgent.y) && (carAgent.y - agent.y)<value)
 			{
+				
+				if((new String(agent.direction).equals("null")) && (agent.y==carAgent.y))
+					return null;
 				value=(carAgent.y - agent.y);
+				System.out.println("agent.x= " + agent.x + " agent.y= " + agent.y + " value " + value);
 				return agent;
 			}
 		}
-		if(((new String(agent.direction).equals("east")) || (new String(agent.direction).equals("null"))) &&  carAgent.y==agent.y)
+		if(((new String(carAgent.direction).equals("east"))  &&  carAgent.y==agent.y))
 		{
-			if(agent.x >carAgent.x && (agent.x - carAgent.x)<value)
+			if((agent.x > carAgent.x) && (agent.x - carAgent.x)<value)
 			{
+				if((new String(agent.direction).equals("null")) && (agent.x==carAgent.x))
+					return null;
 				value= (agent.x - carAgent.x);
 				return agent;
 			}
 		}
-		if(((new String(agent.direction).equals("west")) || (new String(agent.direction).equals("null"))) &&  carAgent.y==agent.y)
+		if(((new String(carAgent.direction).equals("west")) &&  carAgent.y==agent.y))
 		{
-			if(agent.x <carAgent.x && (carAgent.x - agent.x)<value)
+			if((agent.x <carAgent.x) && (carAgent.x - agent.x)<value)
 			{
+				if((new String(agent.direction).equals("null")) && (agent.x==carAgent.x))
+					return null;
 				value= (carAgent.x - agent.x);
 				return agent;
 			}

@@ -22,8 +22,7 @@ public class IntersectionAgent extends Agent {
 	private int y;
 	private String currentDirection;
 	protected void setup() {
-		x=0;
-		y=10;
+		
 		DFAgentDescription dfd = new DFAgentDescription();
 		dfd.setName(getAID());
 		ServiceDescription sd = new ServiceDescription();
@@ -36,10 +35,15 @@ public class IntersectionAgent extends Agent {
 		catch (FIPAException fe) {
 			fe.printStackTrace();
 		}
+		
+		Object[] objects =getArguments();
+		x=Integer.parseInt((String)objects[0]);
+		y=Integer.parseInt((String)objects[1]);
+		
 		IntersectionAgentBehaviour intersectionBehaviour = new IntersectionAgentBehaviour(this,x,y);
 		addBehaviour(intersectionBehaviour);
-		 
 		System.out.println("Hallo! IntersectionAgent "+getAID().getName()+" is ready.");
+		System.out.println("x= "+x+" y=" + y);
 	}
 
 	protected void takeDown() {
