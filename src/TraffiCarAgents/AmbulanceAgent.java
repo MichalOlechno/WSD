@@ -15,7 +15,7 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import TraffiCarBehaviours2.*;
 
 
-public class CarAgent extends Agent {
+public class AmbulanceAgent extends Agent {
 
 	private double x;
 	private double y;
@@ -24,8 +24,8 @@ public class CarAgent extends Agent {
 		DFAgentDescription dfd = new DFAgentDescription();
 		dfd.setName(getAID());
 		ServiceDescription sd = new ServiceDescription();
-		sd.setType("car");
-		sd.setName("carAgent");
+		sd.setType("ambulance");
+		sd.setName("ambulanceAgent");
 		dfd.addServices(sd);
 		try {
 			DFService.register(this, dfd);
@@ -33,12 +33,14 @@ public class CarAgent extends Agent {
 		catch (FIPAException fe) {
 			fe.printStackTrace();
 		}
+		
+		
 		Object[] objects =getArguments();
 		x=Double.parseDouble((String)objects[0]);
 		y=Double.parseDouble((String)objects[1]);
 		GetNode();
-		 CarBehaviour carBehaviour = new CarBehaviour(this,x,y,currentDirection);
-			addBehaviour(carBehaviour);
+		 AmbulanceBehaviour ambulanceBehaviour = new AmbulanceBehaviour(this,x,y,currentDirection);
+			addBehaviour(ambulanceBehaviour);
 		 
 		System.out.println("Hallo! CarAgent "+getAID().getName()+" is ready.");
 	}

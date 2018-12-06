@@ -21,14 +21,17 @@ public class TrafficManagerBehaviour extends CyclicBehaviour
 {
 	private AID[] carAgents;
 	private AID[] intersectionAgents;
-	private AID[] ambulanceAgents;
+	private ArrayList<AgentClass> ambulanceAgents;
 	private DFAgentDescription carTemplate;
 	private DFAgentDescription intersectionTemplate;
 	private DFAgentDescription ambulanceTemplate;
 	private MessageTemplate requestMessage;
 	private MessageTemplate informMessage;
 	private MessageTemplate informIfMessage;
+	private MessageTemplate queryRefMessage;
 	private ArrayList<AgentClass> agents;
+	private ArrayList<ACLMessage> requestMsgs;
+	private double ambulanceDistance;
 	private long startTime;
 	private long tempTime;
 	private long currentTime;
@@ -47,24 +50,25 @@ public class TrafficManagerBehaviour extends CyclicBehaviour
 		requestMessage=MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
 		informMessage=MessageTemplate.MatchPerformative(ACLMessage.INFORM);
 		informIfMessage=MessageTemplate.MatchPerformative(ACLMessage.INFORM_IF);
+		queryRefMessage=MessageTemplate.MatchPerformative(ACLMessage.QUERY_REF);
 		startTime = System.currentTimeMillis();
+		ambulanceDistance=10;
 		agents=new ArrayList<AgentClass>();
+		ambulanceAgents=new ArrayList<AgentClass>();
 	}
 	public void action()
 	{
-		carAgents=GetAgents(carTemplate);
-		intersectionAgents=GetAgents(intersectionTemplate);
-		ambulanceAgents=GetAgents(ambulanceTemplate);
 		tempTime=System.currentTimeMillis();
 		currentTime=System.currentTimeMillis();
 		while((currentTime-tempTime)<1000)
 		{
-		agents=ReceiveAgentState();
-		if(ambulanceAgents!=null)
+		agents=ReceiveAgentState(informMessage);
+		requestMsgs=GetMessages(requestMessage);
+		if(requestMsgs!=null && requestMsgs.size()>0)
 		{
-			//HandleAmbulance();
+			HandleAmbulance(requestMsgs);
 		}
-		HandleCarsRequests();
+		HandleCarsQueryRef();
 		currentTime=System.currentTimeMillis();
 		}
 		System.out.println("TrafficManager lives, agent size ="+agents.size());
@@ -77,7 +81,15 @@ public class TrafficManagerBehaviour extends CyclicBehaviour
 		msg.setContent(requestedAgent.type + " " + requestedAgent.x +" "+requestedAgent.y +" "+requestedAgent.direction + " "+requestedAgent.lightColor);
 		msg.addReceiver(carAgent.aid);
 		myAgent.send(msg);
-		System.out.println("message sent to" + carAgent.aid);
+		//System.out.println("message sent to" + carAgent.aid);
+	}
+	public void sendRequestMessageToCarAgent(AgentClass carAgent,AgentClass ambulance)
+	{
+		ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
+		msg.setContent(ambulance.direction);
+		msg.addReceiver(carAgent.aid);
+		myAgent.send(msg);
+		//System.out.println("message sent to" + carAgent.aid);
 	}
 	public DFAgentDescription setTemplate(DFAgentDescription template,String AgentType)
 	{
@@ -86,13 +98,72 @@ public class TrafficManagerBehaviour extends CyclicBehaviour
 		template.addServices(sd);
 		return template;
 	}
-	public ArrayList<AgentClass> ReceiveAgentState()
+	public void HandleAmbulance(ArrayList<ACLMessage> msgs)
 	{
-		ArrayList<ACLMessage> messages = GetMessages(informMessage);
+		ambulanceAgents=GetAgentsFromMessage(msgs);
+		ArrayList<AgentClass> closeAgents;
+		for(AgentClass ambulance:ambulanceAgents)
+		{
+			closeAgents=GetCloseAgents(ambulance.x,ambulance.y,ambulance.direction);
+			for(AgentClass closeAgent:closeAgents)
+			{
+				sendRequestMessageToCarAgent(closeAgent,ambulance);
+			}
+		}
+	}
+	
+	public ArrayList<AgentClass> GetCloseAgents(double x, double y, String direction)
+	{
+		ArrayList<AgentClass> agentsList=new ArrayList<AgentClass>();
+		for(AgentClass agent:agents)
+		{
+			
+			if(((new String(direction).equals("north")) &&  x==agent.x))
+		{
+			if(((agent.y-y) < ambulanceDistance) && (agent.y>y))
+			{
+				agentsList.add(agent);
+			}
+		}
+		if(((new String(direction).equals("south")) && x==agent.x))
+		{
+			if(((y - agent.y ) < ambulanceDistance) && (y>agent.y))
+			{
+				agentsList.add(agent);
+			}
+		}
+		if(((new String(direction).equals("east"))  &&  y==agent.y))
+		{
+			if(((agent.x - x) < ambulanceDistance) && (agent.x>x))
+			{
+				agentsList.add(agent);
+			}
+		}
+		if(((new String(direction).equals("west")) &&  y==agent.y))
+		{
+			if(((x- agent.x) < ambulanceDistance) && (x>agent.x))
+			{
+				agentsList.add(agent);
+			}
+		}
+	
+		}
+		for(AgentClass agent:agentsList)
+		{
+			System.out.println("CLOSE AGENTS : agent.x = " +agent.x + " agent.y= " +agent.y +" direction= "+direction +" x = " +x + " y= " + y);
+		}
+		return agentsList;
+		
+	}
+	
+	
+	
+	public ArrayList<AgentClass> ReceiveAgentState(MessageTemplate template)
+	{
+		ArrayList<ACLMessage> messages = GetMessages(template);
 		boolean isNewElement=true;
 		for(ACLMessage message:messages)
 		{
-			
 			for(int i=0;i<agents.size();i++)
 			{
 
@@ -167,9 +238,9 @@ public class TrafficManagerBehaviour extends CyclicBehaviour
 		agent.aid=message.getSender();
 		return agent;
 	}
-	public void HandleCarsRequests()
+	public void HandleCarsQueryRef()
 	{
-		ArrayList<ACLMessage> messages=GetMessages(requestMessage);
+		ArrayList<ACLMessage> messages=GetMessages(queryRefMessage);
 		ArrayList<AgentClass> carAgents=GetAgentsFromMessage(messages);
 		AgentClass tempAgent;
 

@@ -9,12 +9,14 @@ import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
+import java.util.ArrayList;
 import TrafficarClasses.*;
 
 public class IntersectionAgentBehaviour extends CyclicBehaviour 
 {
 	private DFAgentDescription trafficManagerTemplate;
 	private MessageTemplate requestMessage;
+
 	private MessageTemplate informMessage;
 	private String lightColor;
 	private double x;
@@ -22,6 +24,7 @@ public class IntersectionAgentBehaviour extends CyclicBehaviour
 	private long startTime;
 	private long tempTime;
 	private long currentTime;
+	private String ambulanceDirection;
 	private long lightChangingRatio=50000;
 	private AID trafficManagerAID;
 	
@@ -30,10 +33,11 @@ public class IntersectionAgentBehaviour extends CyclicBehaviour
 		super(a);
 		x=X;
 		y=Y;
-		lightColor="red";
+		lightColor="green";
 		trafficManagerTemplate = new DFAgentDescription();
 		trafficManagerTemplate=setTemplate(trafficManagerTemplate,"TrafficManager");
 		requestMessage=MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
+
 		informMessage=MessageTemplate.MatchPerformative(ACLMessage.INFORM);
 		startTime = System.currentTimeMillis();
 		trafficManagerAID=GetAgents(trafficManagerTemplate)[0];
@@ -48,11 +52,15 @@ public class IntersectionAgentBehaviour extends CyclicBehaviour
 			tempTime=System.currentTimeMillis();
 			while((currentTime-tempTime)<500)
 			{
-				//ACLMessage msg = ReceiveRequestMessage
-				ACLMessage msg =null;
-				if(msg!=null)
+				ArrayList<ACLMessage> msgs = ReceiveMessages(requestMessage);
+				if(msgs!=null && msgs.size()>0)
 				{
-					lightColor="red";
+					ambulanceDirection=msgs.get(0).getContent();
+					if((new String(ambulanceDirection).equals("north")) || (new String(ambulanceDirection).equals("south")))
+						lightColor="green";
+					else
+						lightColor="red";
+					
 					startTime=System.currentTimeMillis();
 				}
 				currentTime=System.currentTimeMillis();
@@ -69,7 +77,17 @@ public class IntersectionAgentBehaviour extends CyclicBehaviour
 		msg.addReceiver(trafficManagerAID);
 		myAgent.send(msg);
 	}
-	
+	private ArrayList<ACLMessage> ReceiveMessages(MessageTemplate template)
+	{
+		ArrayList<ACLMessage> msgs = new ArrayList<ACLMessage>();
+		ACLMessage msg = myAgent.receive(template);
+		while(msg!=null)
+		{
+		msgs.add(msg);
+		msg = myAgent.receive(template);
+		}
+		return msgs;
+	}
 	
 	public void changeLights()
 	{

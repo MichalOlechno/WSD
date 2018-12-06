@@ -15,7 +15,7 @@ import java.util.Arrays;
 import TrafficarClasses.*;
 import java.util.concurrent.TimeUnit;
 
-public class CarBehaviour extends CyclicBehaviour 
+public class AmbulanceBehaviour extends CyclicBehaviour 
 {
 	private String status;	
 	private double x;
@@ -25,18 +25,19 @@ public class CarBehaviour extends CyclicBehaviour
 	private String currentDirection;
 	private String mode;
 	private AgentClass nextAgent;
+	private String nextAgentmode;
+	private String lightColor;
 	private DFAgentDescription trafficManagerTemplate;
 	private MessageTemplate requestMessage;
 	private MessageTemplate informMessage;
-	private MessageTemplate informIFMessage;
 	private long startTime;
 	private long tempTime;
 	private long measureTime;	
 	private double v;
 	private AID trafficManagerAID;
-	private boolean ambulanceIsNear;
+	private boolean messageSent=false;
 	
-	public CarBehaviour(Agent a,double X,double Y,String CurrentDirection)
+	public AmbulanceBehaviour(Agent a,double X,double Y,String CurrentDirection)
 	{
 		super(a);
 		x=X;
@@ -46,75 +47,39 @@ public class CarBehaviour extends CyclicBehaviour
 		currentDirection=CurrentDirection;
 		mode="run";
 		nextAgent=null;
-		ambulanceIsNear=false;
+		nextAgentmode="run";
+		lightColor="green";
 		trafficManagerTemplate = new DFAgentDescription();
 		trafficManagerTemplate=setTemplate(trafficManagerTemplate,"TrafficManager");
 		trafficManagerAID=GetAgents(trafficManagerTemplate)[0];
 		requestMessage=MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
 		informMessage=MessageTemplate.MatchPerformative(ACLMessage.INFORM);
-		informIFMessage=MessageTemplate.MatchPerformative(ACLMessage.INFORM_IF);
 		startTime = System.currentTimeMillis();
-		v=0.2;
+		v=1;
 	}
 		
 	public void action()
-	{ // funkcja do poruszania się samochodu
+	{ 	// funkcja do poruszania się samochodu
 		tempTime=System.currentTimeMillis();
 		measureTime=System.currentTimeMillis();
 		sendStatusMessage();
+		sendRequestMessage();
 		nextAgent=getNextAgent();
 		while((measureTime-tempTime)<500)
 		{
-	    boolean isAmbulance = isNeedToMakePlaceForAmbulance(x,y,currentDirection); // w kazdej chwili pytamy managera ruchu czy trzeba stanąc na bok i sie zatrzymac bo jedzie ambulans
-	    if (isAmbulance && ambulanceIsNear==false)
-	    { 											// gdy jest ambulans, zjeżdzamy z drogi
-	    	makePlaceForAmbulance(currentDirection);
-			System.out.println("!!!!!!!!!!!!!!!!!!zjechane");
 			
-	    }
-		if(ambulanceIsNear)
+	    if(mode=="run")
 		{
-			System.out.println("!!!!!!!!!!!!!!!!!!ambulanceisNear");
-			if(CanComeBackToRoad())
-			{
-				System.out.println("!!!!!!!!!!!!!!!!!!backOnTrack");
-				getBackOnRoad();
-			}
-			measureTime=System.currentTimeMillis();
+	    	move(); // w przeciwnym wypadku jedziemy normlnie
 		}
-		else
-		{
-			if(mode=="run")
-			{
-				move(); // w przeciwnym wypadku jedziemy normlnie
-			}
-			if(mode=="stop")
-			{
-				stop();
-			}
-			measureTime=System.currentTimeMillis();
-			}
+	    if(mode=="stop")
+	    {
+	    	stop();
+	    }
+		measureTime=System.currentTimeMillis();
 		}
 	}
 	
-	public boolean CanComeBackToRoad()
-	{
-		sendQueryIFMessage();
-		ArrayList<ACLMessage> msgs= ReceiveMessages(informIFMessage);
-		if(msgs != null && msgs.size()>0)
-			return true;
-		try
-		{
-			TimeUnit.MILLISECONDS.sleep(200);
-		}
-		catch(Exception ex)
-		{
-			
-		}
-		return false;
-		
-		
-	}
 	
 	public void move()
 	{
@@ -149,7 +114,7 @@ public class CarBehaviour extends CyclicBehaviour
 				System.out.println("next agent x= "+nextAgent.x);
 				System.out.println("next agent y= "+nextAgent.y);
 				startTime=System.currentTimeMillis();
-				sendStatusMessage();
+				sendRequestMessage();
 				try
 			{
 				TimeUnit.MILLISECONDS.sleep(500);
@@ -195,7 +160,7 @@ public class CarBehaviour extends CyclicBehaviour
 			default:
 			break;
 		}			
-return canTakeStep;
+		return canTakeStep;
 	}		
 
 	public String GetRandomDirection(String currentDirection)
@@ -229,7 +194,7 @@ return canTakeStep;
 	public AgentClass getNextAgent()
 	{
 		sendQueryRefMessage();
-		System.out.println("query ref sent");
+		System.out.println("Query ref sent");
 		ACLMessage msg = myAgent.receive(informMessage);
 		while(msg==null)
 		{
@@ -263,13 +228,13 @@ return canTakeStep;
 	
 	public boolean isNeedToMakePlaceForAmbulance(double x, double y, String currentDirection)
 	{	
-		ArrayList<ACLMessage> msgs=ReceiveMessages(requestMessage);
-		
-		if(msgs!=null && msgs.size()>0)
+		//get type Request
+		//ACLMessage msg=ACLMessage.Receive()
+		boolean ambulanceIsComming=false; // implement message query-inform and wait for response.
+		if(ambulanceIsComming)
 		{
 			return true;
 		}
-		
 		return false;
 	}
 
@@ -297,7 +262,6 @@ return canTakeStep;
 		
 	void makePlaceForAmbulance(String currentDirection)
 	{
-		ambulanceIsNear=true;
 		x0=x;
 		y0=y;
 		if (currentDirection == "north")
@@ -316,12 +280,6 @@ return canTakeStep;
 		{
 			y = y0 - 1;
 		}
-	}
-	void getBackOnRoad()
-	{
-		ambulanceIsNear=false;
-		x=x0;
-		y=y0;
 	}
 	void stop()
 	{
@@ -381,28 +339,21 @@ return canTakeStep;
 	public void sendStatusMessage()
 	{
 		ACLMessage msg = new ACLMessage( ACLMessage.INFORM );
-		msg.setContent("car "+ x +" "+y +" "+currentDirection + " null");
+		msg.setContent("amublance "+ x +" "+y +" "+currentDirection + " null");
 		msg.addReceiver(trafficManagerAID);
 		myAgent.send(msg);
 	}
 	public void sendRequestMessage()
 	{
 		ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
-		msg.setContent("car "+ x +" "+y +" "+currentDirection + " null");
+		msg.setContent("amublance "+ x +" "+y +" "+currentDirection + " null");
 		msg.addReceiver(trafficManagerAID);
 		myAgent.send(msg);
 	}
 	public void sendQueryRefMessage()
 	{
 		ACLMessage msg = new ACLMessage( ACLMessage.QUERY_REF);
-		msg.setContent("car "+ x +" "+y +" "+currentDirection + " null");
-		msg.addReceiver(trafficManagerAID);
-		myAgent.send(msg);
-	}
-	public void sendQueryIFMessage()
-	{
-		ACLMessage msg = new ACLMessage( ACLMessage.QUERY_IF);
-		msg.setContent("car "+ x +" "+y +" "+currentDirection + " null");
+		msg.setContent("amublance "+ x +" "+y +" "+currentDirection + " null");
 		msg.addReceiver(trafficManagerAID);
 		myAgent.send(msg);
 	}
