@@ -20,6 +20,8 @@ public class AmbulanceAgent extends Agent {
 	private double x;
 	private double y;
 	private String currentDirection;
+	//Rejestracja typ agenta, aby później łatwo go znaleźć
+	//Dodanie odpowiednią klase zachowań 
 	protected void setup() {
 		DFAgentDescription dfd = new DFAgentDescription();
 		dfd.setName(getAID());
@@ -34,7 +36,7 @@ public class AmbulanceAgent extends Agent {
 			fe.printStackTrace();
 		}
 		
-		
+		// Ustawienie początkowego położenia agenta
 		Object[] objects =getArguments();
 		x=Double.parseDouble((String)objects[0]);
 		y=Double.parseDouble((String)objects[1]);
@@ -49,7 +51,7 @@ public class AmbulanceAgent extends Agent {
 	    // Printout a dismissal message
 	    System.out.println("CarAgent "+getAID().getName()+" terminating.");
 	}
-	
+	// Wyznaczenie początkowego kierunku ruchu agenta
 	void GetNode()
 	{
 		if(x<20 && y==20)

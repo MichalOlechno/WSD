@@ -27,7 +27,7 @@ public class TrafficManagerBehaviour extends CyclicBehaviour
 	private DFAgentDescription ambulanceTemplate;
 	private MessageTemplate requestMessage;
 	private MessageTemplate informMessage;
-	private MessageTemplate informIfMessage;
+	private MessageTemplate queryIfMessage;
 	private MessageTemplate queryRefMessage;
 	private ArrayList<AgentClass> agents;
 	private ArrayList<ACLMessage> requestMsgs;
@@ -49,7 +49,7 @@ public class TrafficManagerBehaviour extends CyclicBehaviour
 		ambulanceTemplate=setTemplate(ambulanceTemplate,"ambulance");
 		requestMessage=MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
 		informMessage=MessageTemplate.MatchPerformative(ACLMessage.INFORM);
-		informIfMessage=MessageTemplate.MatchPerformative(ACLMessage.INFORM_IF);
+		queryIfMessage=MessageTemplate.MatchPerformative(ACLMessage.QUERY_IF);
 		queryRefMessage=MessageTemplate.MatchPerformative(ACLMessage.QUERY_REF);
 		startTime = System.currentTimeMillis();
 		ambulanceDistance=10;
@@ -62,14 +62,15 @@ public class TrafficManagerBehaviour extends CyclicBehaviour
 		currentTime=System.currentTimeMillis();
 		while((currentTime-tempTime)<1000)
 		{
-		agents=ReceiveAgentState(informMessage);
-		requestMsgs=GetMessages(requestMessage);
-		if(requestMsgs!=null && requestMsgs.size()>0)
-		{
-			HandleAmbulance(requestMsgs);
-		}
-		HandleCarsQueryRef();
-		currentTime=System.currentTimeMillis();
+			agents=ReceiveAgentState(informMessage);
+			requestMsgs=GetMessages(requestMessage);
+			if(requestMsgs!=null && requestMsgs.size()>0)
+			{
+				HandleAmbulance(requestMsgs);
+			}
+			HandleCarsQueryRef();
+			HandleCarsQueryIf();
+			currentTime=System.currentTimeMillis();
 		}
 		System.out.println("TrafficManager lives, agent size ="+agents.size());
 		SaveAgentsStates();
@@ -91,6 +92,15 @@ public class TrafficManagerBehaviour extends CyclicBehaviour
 		myAgent.send(msg);
 		//System.out.println("message sent to" + carAgent.aid);
 	}
+	public void SendInformIFMessage(AgentClass agent)
+	{
+		ACLMessage msg = new ACLMessage(ACLMessage.INFORM_IF);
+		msg.setContent(" ");
+		msg.addReceiver(agent.aid);
+		myAgent.send(msg);
+		//System.out.println("message sent to" + agent.aid);
+	}
+	
 	public DFAgentDescription setTemplate(DFAgentDescription template,String AgentType)
 	{
 		ServiceDescription sd = new ServiceDescription();
@@ -111,6 +121,48 @@ public class TrafficManagerBehaviour extends CyclicBehaviour
 			}
 		}
 	}
+	public void HandleCarsQueryIf()
+	{
+		ArrayList<ACLMessage> msgs = GetMessages(queryIfMessage);
+		ArrayList<AgentClass> queryIfAgents=GetAgentsFromMessage(msgs);
+		ArrayList<AgentClass> closeAgents;
+		ArrayList<AgentClass> agentWhichShouldntGoBackOnTrack=new ArrayList<AgentClass>();
+		if(msgs!=null && msgs.size()>0)
+		{
+		for(AgentClass ambulance:ambulanceAgents)
+		{
+			closeAgents=GetCloseAgents(ambulance.x,ambulance.y,ambulance.direction);
+			for(AgentClass agent:queryIfAgents)
+			{
+				if(isListContainAgent(closeAgents,agent))
+					agentWhichShouldntGoBackOnTrack.add(agent);
+				System.out.println("QUERY IF AGENTS:" + agent.name);
+			}
+			for(AgentClass agent:closeAgents)
+			{
+				System.out.println("CLOSE AGENTS:" + agent.name);
+			}
+		}
+		for(AgentClass agent:queryIfAgents)
+		{
+			if(isListContainAgent(agentWhichShouldntGoBackOnTrack,agent)==false)
+			{
+				//System.out.println("AGENT WHICH SOULD GO BACK:" +agent.name); 
+				SendInformIFMessage(agent);
+			}
+		}
+		}
+	}
+	public boolean isListContainAgent(ArrayList<AgentClass> agentsList, AgentClass agent)
+	{
+		for(AgentClass a:agentsList)
+		{
+			if(new String(a.name).equals(agent.name))
+				return true;
+		}
+		return false;
+		
+	}
 	
 	public ArrayList<AgentClass> GetCloseAgents(double x, double y, String direction)
 	{
@@ -118,44 +170,57 @@ public class TrafficManagerBehaviour extends CyclicBehaviour
 		for(AgentClass agent:agents)
 		{
 			
-			if(((new String(direction).equals("north")) &&  x==agent.x))
+			if((new String(direction).equals("north")) &&  AgentsOnTheSameLine(x,y,direction,agent))
 		{
-			if(((agent.y-y) < ambulanceDistance) && (agent.y>y))
+			if((Math.abs(agent.y-y)) < ambulanceDistance)
 			{
 				agentsList.add(agent);
 			}
 		}
-		if(((new String(direction).equals("south")) && x==agent.x))
+		if((new String(direction).equals("south")) && AgentsOnTheSameLine(x,y,direction,agent))
 		{
-			if(((y - agent.y ) < ambulanceDistance) && (y>agent.y))
+			if((Math.abs(y - agent.y )) < ambulanceDistance)
 			{
 				agentsList.add(agent);
 			}
 		}
-		if(((new String(direction).equals("east"))  &&  y==agent.y))
+		if((new String(direction).equals("east"))  &&  AgentsOnTheSameLine(x,y,direction,agent))
 		{
-			if(((agent.x - x) < ambulanceDistance) && (agent.x>x))
+			if((Math.abs(agent.x - x)) < ambulanceDistance)
 			{
 				agentsList.add(agent);
 			}
 		}
-		if(((new String(direction).equals("west")) &&  y==agent.y))
+		if((new String(direction).equals("west")) &&  AgentsOnTheSameLine(x,y,direction,agent))
 		{
-			if(((x- agent.x) < ambulanceDistance) && (x>agent.x))
+			if((Math.abs(x- agent.x)) < ambulanceDistance)
 			{
 				agentsList.add(agent);
 			}
 		}
 	
 		}
-		for(AgentClass agent:agentsList)
-		{
-			System.out.println("CLOSE AGENTS : agent.x = " +agent.x + " agent.y= " +agent.y +" direction= "+direction +" x = " +x + " y= " + y);
-		}
+		//for(AgentClass agent:agentsList)
+		//{
+			//System.out.println("CLOSE AGENTS : agent.x = " +agent.x + " agent.y= " +agent.y +" direction= "+direction +" x = " +x + " y= " + y);
+		//}
 		return agentsList;
 		
 	}
-	
+	public boolean AgentsOnTheSameLine(double x, double y,String direction, AgentClass agent)
+	{
+		if((Math.abs(agent.y-y))<=1 && x<=20 && agent.x<=20 && (new String(direction).equals(agent.direction)))
+			return true;
+		if((Math.abs(agent.y-y))<=1 && x>=20 && x<=40 && agent.x>=20 && agent.x<=40 && (new String(direction).equals(agent.direction)))
+			return true;
+		if((Math.abs(agent.y-y))<=1 && x>=40 && agent.x>=40 && (new String(direction).equals(agent.direction)))
+			return true;
+		if((Math.abs(agent.x-x))<=1 && y<=20 && agent.y<=20 && (new String(direction).equals(agent.direction)))
+			return true;
+		if((Math.abs(agent.x-x))<=1 && y>=20 && agent.y>=20 && (new String(direction).equals(agent.direction)))
+			return true;
+		return false;
+	}
 	
 	
 	public ArrayList<AgentClass> ReceiveAgentState(MessageTemplate template)

@@ -54,7 +54,7 @@ public class CarBehaviour extends CyclicBehaviour
 		informMessage=MessageTemplate.MatchPerformative(ACLMessage.INFORM);
 		informIFMessage=MessageTemplate.MatchPerformative(ACLMessage.INFORM_IF);
 		startTime = System.currentTimeMillis();
-		v=0.2;
+		v=0.5;
 	}
 		
 	public void action()
@@ -100,9 +100,6 @@ public class CarBehaviour extends CyclicBehaviour
 	public boolean CanComeBackToRoad()
 	{
 		sendQueryIFMessage();
-		ArrayList<ACLMessage> msgs= ReceiveMessages(informIFMessage);
-		if(msgs != null && msgs.size()>0)
-			return true;
 		try
 		{
 			TimeUnit.MILLISECONDS.sleep(200);
@@ -111,6 +108,9 @@ public class CarBehaviour extends CyclicBehaviour
 		{
 			
 		}
+		ArrayList<ACLMessage> msgs= ReceiveMessages(informIFMessage);
+		if(msgs != null && msgs.size()>0)
+			return true;
 		return false;
 		
 		
@@ -203,8 +203,6 @@ return canTakeStep;
 		String newDirection=currentDirection;
 		Random rand=new Random();
 		int n;
-		while(newDirection==currentDirection)
-		{
 			n=rand.nextInt(4);
 			switch(n) {
 			case 0:
@@ -220,7 +218,7 @@ return canTakeStep;
 				newDirection="west";
 				break;
 			}
-		}
+		
 		return newDirection;
 	}
 	
@@ -322,6 +320,7 @@ return canTakeStep;
 		ambulanceIsNear=false;
 		x=x0;
 		y=y0;
+		startTime=System.currentTimeMillis();
 	}
 	void stop()
 	{

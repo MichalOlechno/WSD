@@ -21,6 +21,8 @@ public class IntersectionAgent extends Agent {
 	private int x;
 	private int y;
 	private String currentDirection;
+	//Rejestracja typ agenta, aby później łatwo go znaleźć
+	//Dodanie odpowiednią klase zachowań 
 	protected void setup() {
 		
 		DFAgentDescription dfd = new DFAgentDescription();
@@ -35,7 +37,7 @@ public class IntersectionAgent extends Agent {
 		catch (FIPAException fe) {
 			fe.printStackTrace();
 		}
-		
+		// Ustawienie początkowego położenia agenta
 		Object[] objects =getArguments();
 		x=Integer.parseInt((String)objects[0]);
 		y=Integer.parseInt((String)objects[1]);

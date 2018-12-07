@@ -16,6 +16,8 @@ import TraffiCarBehaviours.*;
 
 public class TrafficManagerAgent extends Agent {
 	
+	//Rejestracja typ agenta, aby później łatwo go znaleźć
+	//Dodanie odpowiednią klase zachowań 
 	protected void setup()
 	{
 		DFAgentDescription dfd = new DFAgentDescription();

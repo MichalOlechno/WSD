@@ -20,6 +20,9 @@ public class CarAgent extends Agent {
 	private double x;
 	private double y;
 	private String currentDirection;
+	
+	//Rejestracja typ agenta, aby później łatwo go znaleźć
+	//Dodanie odpowiednią klase zachowań 
 	protected void setup() {
 		DFAgentDescription dfd = new DFAgentDescription();
 		dfd.setName(getAID());
@@ -33,6 +36,7 @@ public class CarAgent extends Agent {
 		catch (FIPAException fe) {
 			fe.printStackTrace();
 		}
+		// Ustawienie początkowego położenia agenta
 		Object[] objects =getArguments();
 		x=Double.parseDouble((String)objects[0]);
 		y=Double.parseDouble((String)objects[1]);
@@ -48,7 +52,8 @@ public class CarAgent extends Agent {
 	    System.out.println("CarAgent "+getAID().getName()+" terminating.");
 	}
 	
-	void GetNode()
+	// Wyznaczenie początkowego kierunku ruchu agenta
+	protected void GetNode()
 	{
 		if(x<20 && y==20)
 			currentDirection="east";
