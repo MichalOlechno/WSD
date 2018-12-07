@@ -36,7 +36,7 @@ public class CarAgent extends Agent {
 		catch (FIPAException fe) {
 			fe.printStackTrace();
 		}
-		// Ustawienie początkowego położenia agenta
+	// Ustawienie początkowego położenia agenta
 		Object[] objects =getArguments();
 		x=Double.parseDouble((String)objects[0]);
 		y=Double.parseDouble((String)objects[1]);
@@ -48,10 +48,8 @@ public class CarAgent extends Agent {
 	}
 
 	protected void takeDown() {
-	    // Printout a dismissal message
 	    System.out.println("CarAgent "+getAID().getName()+" terminating.");
 	}
-	
 	// Wyznaczenie początkowego kierunku ruchu agenta
 	protected void GetNode()
 	{

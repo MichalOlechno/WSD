@@ -25,6 +25,7 @@ public class IntersectionAgentBehaviour extends CyclicBehaviour
 	private long tempTime;
 	private long currentTime;
 	private String ambulanceDirection;
+	// czas po którym zmieniają się światła 
 	private long lightChangingRatio=50000;
 	private AID trafficManagerAID;
 	
@@ -34,24 +35,26 @@ public class IntersectionAgentBehaviour extends CyclicBehaviour
 		x=X;
 		y=Y;
 		lightColor="green";
+		//pobierz agenta typu TrafficManager
 		trafficManagerTemplate = new DFAgentDescription();
 		trafficManagerTemplate=setTemplate(trafficManagerTemplate,"TrafficManager");
-		requestMessage=MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
-
-		informMessage=MessageTemplate.MatchPerformative(ACLMessage.INFORM);
-		startTime = System.currentTimeMillis();
 		trafficManagerAID=GetAgents(trafficManagerTemplate)[0];
-		
+		requestMessage=MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
+		informMessage=MessageTemplate.MatchPerformative(ACLMessage.INFORM);
+		startTime = System.currentTimeMillis();		
 	}
+	//Główna metoda klasy; Wykonuje się w nieskończonej pętli
 	public void action()
 	{
 		startTime=System.currentTimeMillis();
 		currentTime=System.currentTimeMillis();
 		while((currentTime-startTime)<lightChangingRatio)
 		{
+			
 			tempTime=System.currentTimeMillis();
 			while((currentTime-tempTime)<500)
 			{
+				// jeżeli otrzymano wiadomość typu request, zmień światło odpowiednio do kierunku ruchu karetki
 				ArrayList<ACLMessage> msgs = ReceiveMessages(requestMessage);
 				if(msgs!=null && msgs.size()>0)
 				{
@@ -65,11 +68,13 @@ public class IntersectionAgentBehaviour extends CyclicBehaviour
 				}
 				currentTime=System.currentTimeMillis();
 			}
+			//wyślij wiadomość o stanie agenta co 500 milisekund
 			sendStatusMessage();
 			currentTime=System.currentTimeMillis();
 		}
 		changeLights();
 	}
+	//wyślij dane o agencie do Traffic Managera
 	public void sendStatusMessage()
 	{
 		ACLMessage msg = new ACLMessage( ACLMessage.INFORM );
@@ -77,6 +82,7 @@ public class IntersectionAgentBehaviour extends CyclicBehaviour
 		msg.addReceiver(trafficManagerAID);
 		myAgent.send(msg);
 	}
+	//odbierz wiadomości
 	private ArrayList<ACLMessage> ReceiveMessages(MessageTemplate template)
 	{
 		ArrayList<ACLMessage> msgs = new ArrayList<ACLMessage>();
@@ -96,6 +102,7 @@ public class IntersectionAgentBehaviour extends CyclicBehaviour
 		else
 			lightColor="red";
 	} 
+
 	public AID[] GetAgents(DFAgentDescription template)
 	{
 		try

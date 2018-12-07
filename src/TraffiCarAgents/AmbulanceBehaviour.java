@@ -17,7 +17,6 @@ import java.util.concurrent.TimeUnit;
 
 public class AmbulanceBehaviour extends CyclicBehaviour 
 {
-	private String status;	
 	private double x;
 	private double y;
 	private double x0;
@@ -25,17 +24,15 @@ public class AmbulanceBehaviour extends CyclicBehaviour
 	private String currentDirection;
 	private String mode;
 	private AgentClass nextAgent;
-	private String nextAgentmode;
-	private String lightColor;
 	private DFAgentDescription trafficManagerTemplate;
 	private MessageTemplate requestMessage;
 	private MessageTemplate informMessage;
 	private long startTime;
 	private long tempTime;
-	private long measureTime;	
+	private long measureTime;
+	// prędkość karetki	
 	private double v;
 	private AID trafficManagerAID;
-	private boolean messageSent=false;
 	
 	public AmbulanceBehaviour(Agent a,double X,double Y,String CurrentDirection)
 	{
@@ -47,8 +44,6 @@ public class AmbulanceBehaviour extends CyclicBehaviour
 		currentDirection=CurrentDirection;
 		mode="run";
 		nextAgent=null;
-		nextAgentmode="run";
-		lightColor="green";
 		trafficManagerTemplate = new DFAgentDescription();
 		trafficManagerTemplate=setTemplate(trafficManagerTemplate,"TrafficManager");
 		trafficManagerAID=GetAgents(trafficManagerTemplate)[0];
@@ -57,20 +52,23 @@ public class AmbulanceBehaviour extends CyclicBehaviour
 		startTime = System.currentTimeMillis();
 		v=1;
 	}
-		
+	//Główna metoda klasy; Wykonuje się w nieskończonej pętli
 	public void action()
-	{ 	// funkcja do poruszania się samochodu
+	{
 		tempTime=System.currentTimeMillis();
 		measureTime=System.currentTimeMillis();
+		//wysłanie statusu agenta do TrafficManagera
 		sendStatusMessage();
+		//wyślij wiadomość typu request do TrafficManagera, żeby zapewnić bezkolizyjny przejazd
 		sendRequestMessage();
+		// pobierz agenta znajdującego się przed karetką
 		nextAgent=getNextAgent();
 		while((measureTime-tempTime)<500)
 		{
 			
 	    if(mode=="run")
 		{
-	    	move(); // w przeciwnym wypadku jedziemy normlnie
+	    	move();
 		}
 	    if(mode=="stop")
 	    {
@@ -80,7 +78,7 @@ public class AmbulanceBehaviour extends CyclicBehaviour
 		}
 	}
 	
-	
+	// AmbulanceAget zachowuje się dokładnie tak jak CarAgent w przypadku normalnej jazdy
 	public void move()
 	{
 		
@@ -221,23 +219,9 @@ public class AmbulanceBehaviour extends CyclicBehaviour
 		agent.y=Double.parseDouble(stringList[2]);
 		agent.direction=stringList[3];
 		agent.lightColor=stringList[4];
-		//agent.name=message.getSender().getLocalName();
-		//agent.aid=message.getSender();
 		return agent;
 	}
 	
-	public boolean isNeedToMakePlaceForAmbulance(double x, double y, String currentDirection)
-	{	
-		//get type Request
-		//ACLMessage msg=ACLMessage.Receive()
-		boolean ambulanceIsComming=false; // implement message query-inform and wait for response.
-		if(ambulanceIsComming)
-		{
-			return true;
-		}
-		return false;
-	}
-
 	void takeStep(String currentDirection)
 	{
 		measureTime = System.currentTimeMillis();
@@ -260,27 +244,6 @@ public class AmbulanceBehaviour extends CyclicBehaviour
 		}
 	}
 		
-	void makePlaceForAmbulance(String currentDirection)
-	{
-		x0=x;
-		y0=y;
-		if (currentDirection == "north")
-		{
-			x = x0 + 1;
-		}
-		if (currentDirection == "south")
-		{
-			x = x0 - 1;
-		}
-		if (currentDirection == "east")
-		{
-			y = y0 + 1;
-		}
-		if (currentDirection == "west")
-		{
-			y = y0 - 1;
-		}
-	}
 	void stop()
 	{
 		try
@@ -295,23 +258,6 @@ public class AmbulanceBehaviour extends CyclicBehaviour
 		y0=y;
 		startTime=System.currentTimeMillis();
 		mode="run";
-		//ArrayList<ACLMessage> msgs=new ArrayList<ACLMessage>();
-		//msgs = ReceiveMessages(requestMessage);
-		//try
-		//{
-		//	msgs = ReceiveMessages(requestMessage);
-		//}
-		//catch(Exception ex)
-		//{
-			
-		//}
-		//if(msgs!=null && ParseAgent(msgs.get(1).getContent()).ambulance==null)
-		//{
-		//	x=x0;
-		//	y=y0;
-		//	startTime=System.currentTimeMillis();
-		//	mode="run";
-		//}
 	}
 	
 	private ArrayList<ACLMessage> ReceiveMessages()

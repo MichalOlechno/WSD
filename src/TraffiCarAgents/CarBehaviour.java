@@ -17,7 +17,6 @@ import java.util.concurrent.TimeUnit;
 
 public class CarBehaviour extends CyclicBehaviour 
 {
-	private String status;	
 	private double x;
 	private double y;
 	private double x0;
@@ -31,7 +30,8 @@ public class CarBehaviour extends CyclicBehaviour
 	private MessageTemplate informIFMessage;
 	private long startTime;
 	private long tempTime;
-	private long measureTime;	
+	private long measureTime;
+	//prędkość agenta
 	private double v;
 	private AID trafficManagerAID;
 	private boolean ambulanceIsNear;
@@ -47,47 +47,53 @@ public class CarBehaviour extends CyclicBehaviour
 		mode="run";
 		nextAgent=null;
 		ambulanceIsNear=false;
+		//wyszukanie agenta typu TrafficManager
 		trafficManagerTemplate = new DFAgentDescription();
 		trafficManagerTemplate=setTemplate(trafficManagerTemplate,"TrafficManager");
 		trafficManagerAID=GetAgents(trafficManagerTemplate)[0];
+		//ustawienie templateMessages
 		requestMessage=MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
 		informMessage=MessageTemplate.MatchPerformative(ACLMessage.INFORM);
 		informIFMessage=MessageTemplate.MatchPerformative(ACLMessage.INFORM_IF);
 		startTime = System.currentTimeMillis();
 		v=0.5;
 	}
-		
+//Główna metoda klasy; Wykonuje się w nieskończonej pętli
 	public void action()
-	{ // funkcja do poruszania się samochodu
+	{ 
 		tempTime=System.currentTimeMillis();
 		measureTime=System.currentTimeMillis();
+		// wysyłanie danych o agencie do trafficManagera
 		sendStatusMessage();
+		// pobieranie agenta znajdującego się przed danym agentem
 		nextAgent=getNextAgent();
 		while((measureTime-tempTime)<500)
 		{
-	    boolean isAmbulance = isNeedToMakePlaceForAmbulance(x,y,currentDirection); // w kazdej chwili pytamy managera ruchu czy trzeba stanąc na bok i sie zatrzymac bo jedzie ambulans
+		// sprawdzenie czy w zasięgu pojawiła się karetka, jeżeli tak, samochód zjeżdża na pobocze 
+	    boolean isAmbulance = isNeedToMakePlaceForAmbulance(x,y,currentDirection); 
 	    if (isAmbulance && ambulanceIsNear==false)
-	    { 											// gdy jest ambulans, zjeżdzamy z drogi
+	    { 							
+			
 	    	makePlaceForAmbulance(currentDirection);
-			System.out.println("!!!!!!!!!!!!!!!!!!zjechane");
 			
 	    }
+		// jeżeli samochód zjechał, następuje sprawdzenie można wrócić na drogę
 		if(ambulanceIsNear)
 		{
-			System.out.println("!!!!!!!!!!!!!!!!!!ambulanceisNear");
 			if(CanComeBackToRoad())
 			{
-				System.out.println("!!!!!!!!!!!!!!!!!!backOnTrack");
 				getBackOnRoad();
 			}
 			measureTime=System.currentTimeMillis();
 		}
 		else
 		{
+			//samochód jedzie
 			if(mode=="run")
 			{
-				move(); // w przeciwnym wypadku jedziemy normlnie
+				move();
 			}
+			//samochód stoi na drodze
 			if(mode=="stop")
 			{
 				stop();
@@ -97,6 +103,7 @@ public class CarBehaviour extends CyclicBehaviour
 		}
 	}
 	
+	// sprawdznie czy można wrócić na drogę
 	public boolean CanComeBackToRoad()
 	{
 		sendQueryIFMessage();
@@ -115,28 +122,31 @@ public class CarBehaviour extends CyclicBehaviour
 		
 		
 	}
-	
+	// ruch samochodu
 	public void move()
 	{
-		
+		// jeżeli typ ="none" (nikogo nie ma przed samochodem) jedź 
 		if(new String(nextAgent.type).equals("none"))
 		{
 			takeStep(currentDirection);
         }
+		// jeżeli możesz (najbliższy agent nie jest bliżej niż określona wartość) to jedź, jeżeli nie, to sprawdź typ agenta i zareaguj odpowiednio 
 		if(canTakeStep())
 			takeStep(currentDirection);
 		else{
 		if(new String(nextAgent.type).equals("intersection"))
 		{
-			
+			// skomplikowane warunki są spowodowane tym, że agent typu intersection przyjmuje tylko dwie wartości lightColor - "green" oznacza jazdę dla samochodów w kierunku "north" i "south", "red" przeciwnie.
 			if(((new String(nextAgent.lightColor).equals("red")) && ((new String(currentDirection).equals("north")) || (new String(currentDirection).equals("south"))))
 				|| ((new String(nextAgent.lightColor).equals("green")) && ((new String(currentDirection).equals("east")) || (new String(currentDirection).equals("west")))))
 			{
+				// jeżeli czerwone to stój
 				mode="stop";
 			}
 			if(((new String(nextAgent.lightColor).equals("green")) && ((new String(currentDirection).equals("north")) || (new String(currentDirection).equals("south"))))
 				|| ((new String(nextAgent.lightColor).equals("red")) && ((new String(currentDirection).equals("east")) || (new String(currentDirection).equals("west")))))
 			{
+				// jeżeli zielone to losowo wybierz kierunek ruchu i wjedź na drogę, a następnie pobierz następnego agenta
 				if(canTakeStep())
 					takeStep(currentDirection);
 				else{
@@ -152,6 +162,7 @@ public class CarBehaviour extends CyclicBehaviour
 				sendStatusMessage();
 				try
 			{
+				// czekamy dla pewności, aż nowy status samochodu dotrze do TrafficManagera
 				TimeUnit.MILLISECONDS.sleep(500);
 			}
 			catch(Exception ex)
@@ -175,6 +186,7 @@ public class CarBehaviour extends CyclicBehaviour
 		}
 		}
 	}
+	// sprawdzenie czy następny agent jest wystarczająco daleko, żeby można było jechać
 	public boolean canTakeStep()
 	{
 		boolean canTakeStep=false;
@@ -197,7 +209,7 @@ public class CarBehaviour extends CyclicBehaviour
 		}			
 return canTakeStep;
 	}		
-
+// wyznacz losowy kierunek jazdy
 	public String GetRandomDirection(String currentDirection)
 	{
 		String newDirection=currentDirection;
@@ -223,7 +235,7 @@ return canTakeStep;
 	}
 	
 	
-	
+	// pobierz agenta znajdującego się przed danym samochodem
 	public AgentClass getNextAgent()
 	{
 		sendQueryRefMessage();
@@ -238,11 +250,10 @@ return canTakeStep;
 		return ParseAgent(msg);
 		
 	}
-	
+	//parsowanie agenta na klase AgentClass
 	public AgentClass ParseAgent(ACLMessage message)
 	{
 		String content=message.getContent();
-		//System.out.println("CONTENT=" +content);
 		String[] stringList = content.split(" ");
 		for(String str:stringList)
 		{
@@ -254,11 +265,10 @@ return canTakeStep;
 		agent.y=Double.parseDouble(stringList[2]);
 		agent.direction=stringList[3];
 		agent.lightColor=stringList[4];
-		//agent.name=message.getSender().getLocalName();
-		//agent.aid=message.getSender();
+
 		return agent;
 	}
-	
+	// sprawdzenie czy trzeba zjechać na pobocze
 	public boolean isNeedToMakePlaceForAmbulance(double x, double y, String currentDirection)
 	{	
 		ArrayList<ACLMessage> msgs=ReceiveMessages(requestMessage);
@@ -270,7 +280,7 @@ return canTakeStep;
 		
 		return false;
 	}
-
+// jazda do przodu. Zastosowanie czasu (measureTime-startTime) sprawia, że nie ma opóźnień ruchu agenta, przez dłuższy czas obliczeń
 	void takeStep(String currentDirection)
 	{
 		measureTime = System.currentTimeMillis();
@@ -292,7 +302,7 @@ return canTakeStep;
 			x = x0 - v*0.001*(measureTime-startTime);
 		}
 	}
-		
+		// zjedź na pobocze
 	void makePlaceForAmbulance(String currentDirection)
 	{
 		ambulanceIsNear=true;
@@ -308,13 +318,14 @@ return canTakeStep;
 		}
 		if (currentDirection == "east")
 		{
-			y = y0 + 1;
+			y = y0 - 1;
 		}
 		if (currentDirection == "west")
 		{
-			y = y0 - 1;
+			y = y0 + 1;
 		}
 	}
+	//wróć na drogę
 	void getBackOnRoad()
 	{
 		ambulanceIsNear=false;
@@ -322,6 +333,7 @@ return canTakeStep;
 		y=y0;
 		startTime=System.currentTimeMillis();
 	}
+	// samochód stoi  
 	void stop()
 	{
 		try
@@ -336,23 +348,6 @@ return canTakeStep;
 		y0=y;
 		startTime=System.currentTimeMillis();
 		mode="run";
-		//ArrayList<ACLMessage> msgs=new ArrayList<ACLMessage>();
-		//msgs = ReceiveMessages(requestMessage);
-		//try
-		//{
-		//	msgs = ReceiveMessages(requestMessage);
-		//}
-		//catch(Exception ex)
-		//{
-			
-		//}
-		//if(msgs!=null && ParseAgent(msgs.get(1).getContent()).ambulance==null)
-		//{
-		//	x=x0;
-		//	y=y0;
-		//	startTime=System.currentTimeMillis();
-		//	mode="run";
-		//}
 	}
 	
 	private ArrayList<ACLMessage> ReceiveMessages()
@@ -377,6 +372,7 @@ return canTakeStep;
 		}
 		return msgs;
 	}
+	// wyślij wiadomość typu INFORM
 	public void sendStatusMessage()
 	{
 		ACLMessage msg = new ACLMessage( ACLMessage.INFORM );
@@ -384,6 +380,7 @@ return canTakeStep;
 		msg.addReceiver(trafficManagerAID);
 		myAgent.send(msg);
 	}
+	// wyślij wiadomość typu REQUEST
 	public void sendRequestMessage()
 	{
 		ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
@@ -391,6 +388,7 @@ return canTakeStep;
 		msg.addReceiver(trafficManagerAID);
 		myAgent.send(msg);
 	}
+	// wyślij wiadomość typu QUERY_REF
 	public void sendQueryRefMessage()
 	{
 		ACLMessage msg = new ACLMessage( ACLMessage.QUERY_REF);

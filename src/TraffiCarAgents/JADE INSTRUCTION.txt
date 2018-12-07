@@ -1,0 +1,30 @@
+Po pobraniu framweorka JADE i rozpakowaniu go dostajemy folder "jade".
+Aby poniższe komendy zadziałały, folder TraffiCarAgents należy wkleić do katalogu "jade\scr". Komendy wywoływać trzeba z poziomu folderu "jade".
+
+Kompilowanie agentów po zmianie kodu(i pierwszy raz po pobraniu JADE):
+javac -classpath lib\jade.jar -d classes src\TraffiCarAgents\*.java
+
+uruchomienie symulacji(różne warianty):
+
+java -cp lib\jade.jar;classes jade.Boot -gui -agents "TraficMan:TraffiCarAgents.TrafficManagerAgent;inter1:TraffiCarAgents.IntersectionAgent(20,20);inter2:TraffiCarAgents.IntersectionAgent(40,20);car1:TraffiCarAgents.CarAgent(0,20);car2:TraffiCarAgents.CarAgent(2,20);car3:TraffiCarAgents.CarAgent(20,40);car4:TraffiCarAgents.CarAgent(20,42)"
+
+java -cp lib\jade.jar;classes jade.Boot -gui -agents "TraficMan:TraffiCarAgents.TrafficManagerAgent;inter1:TraffiCarAgents.IntersectionAgent(20,20);inter2:TraffiCarAgents.IntersectionAgent(40,20);car1:TraffiCarAgents.CarAgent(0,20);ambulance1:TraffiCarAgents.AmbulanceAgent(-15,20)"
+
+java -cp lib\jade.jar;classes jade.Boot -gui -agents "TraficMan:TraffiCarAgents.TrafficManagerAgent;inter1:TraffiCarAgents.IntersectionAgent(20,20);inter2:TraffiCarAgents.IntersectionAgent(40,20);car1:TraffiCarAgents.CarAgent(0,20);car2:TraffiCarAgents.CarAgent(3,20);car3:TraffiCarAgents.CarAgent(20,22);car4:TraffiCarAgents.CarAgent(20,24);car5:TraffiCarAgents.CarAgent(20,17);car6:TraffiCarAgents.CarAgent(20,16);ambulance1:TraffiCarAgents.AmbulanceAgent(-15,20)"
+
+
+Informacja o przyjętym układzie skrzyżowań:
+
+NODES:
+
+A(0,20)
+B(20,40)
+C(20,0)
+D(40,40)
+E(40,0)
+F(60,20)
+
+INTERSECTIONS
+
+I1(20,20)
+I2(40,20)
