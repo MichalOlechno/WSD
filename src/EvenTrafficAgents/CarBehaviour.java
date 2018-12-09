@@ -1,4 +1,4 @@
-package TraffiCarBehaviours2;
+package EvenTrafficBehaviours;
 
 import jade.core.*;
 import jade.core.behaviours.*;
@@ -12,7 +12,7 @@ import java.util.Random;
 import java.awt.List;
 import java.util.ArrayList;
 import java.util.Arrays;
-import TrafficarClasses.*;
+import EvenTrafficClasses.*;
 import java.util.concurrent.TimeUnit;
 
 public class CarBehaviour extends CyclicBehaviour 

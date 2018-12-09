@@ -1,4 +1,4 @@
-package TraffiCarAgents;
+package EvenTrafficAgents;
 
 import jade.core.*;
 import jade.core.behaviours.*;
@@ -12,24 +12,22 @@ import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
-import TraffiCarBehaviours2.*;
-import TraffiCarBehaviours.*;
+import EvenTrafficBehaviours.*;
 
 
-public class IntersectionAgent extends Agent {
+public class AmbulanceAgent extends Agent {
 
-	private int x;
-	private int y;
+	private double x;
+	private double y;
 	private String currentDirection;
 	//Rejestracja typ agenta, aby później łatwo go znaleźć
 	//Dodanie odpowiednią klase zachowań 
 	protected void setup() {
-		
 		DFAgentDescription dfd = new DFAgentDescription();
 		dfd.setName(getAID());
 		ServiceDescription sd = new ServiceDescription();
-		sd.setType("intersection");
-		sd.setName("intersectionAgent");
+		sd.setType("ambulance");
+		sd.setName("ambulanceAgent");
 		dfd.addServices(sd);
 		try {
 			DFService.register(this, dfd);
@@ -37,20 +35,32 @@ public class IntersectionAgent extends Agent {
 		catch (FIPAException fe) {
 			fe.printStackTrace();
 		}
+		
 		// Ustawienie początkowego położenia agenta
 		Object[] objects =getArguments();
-		x=Integer.parseInt((String)objects[0]);
-		y=Integer.parseInt((String)objects[1]);
-		
-		IntersectionAgentBehaviour intersectionBehaviour = new IntersectionAgentBehaviour(this,x,y);
-		addBehaviour(intersectionBehaviour);
-		System.out.println("Hallo! IntersectionAgent "+getAID().getName()+" is ready.");
-		System.out.println("x= "+x+" y=" + y);
+		x=Double.parseDouble((String)objects[0]);
+		y=Double.parseDouble((String)objects[1]);
+		GetNode();
+		 AmbulanceBehaviour ambulanceBehaviour = new AmbulanceBehaviour(this,x,y,currentDirection);
+			addBehaviour(ambulanceBehaviour);
+		 
+		System.out.println("Hallo! CarAgent "+getAID().getName()+" is ready.");
 	}
 
 	protected void takeDown() {
 	    // Printout a dismissal message
-	    System.out.println("IntersectionAgent "+getAID().getName()+" terminating.");
-	  }
-	
+	    System.out.println("CarAgent "+getAID().getName()+" terminating.");
+	}
+	// Wyznaczenie początkowego kierunku ruchu agenta
+	void GetNode()
+	{
+		if(x<20 && y==20)
+			currentDirection="east";
+		else if(y>20 && ( x==20 || x==40))
+			currentDirection="south";
+		else if(y<20 && ( x==20 || x==40))
+			currentDirection="north";
+		else
+			currentDirection="west";		
+	}
 }

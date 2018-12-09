@@ -1,4 +1,4 @@
-package TrafficarClasses;
+package EvenTrafficClasses;
 
 import jade.core.*;
 import jade.core.behaviours.*;

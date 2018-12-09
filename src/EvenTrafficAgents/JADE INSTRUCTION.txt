@@ -28,3 +28,8 @@ INTERSECTIONS
 
 I1(20,20)
 I2(40,20)
+
+
+Opracowanie wyników:
+- pliki rozdzielamy do odpowiednich folderów w folderze data - oddzielnie karetki, samochody, skrzyżowania
+- wyniki są w pliku output

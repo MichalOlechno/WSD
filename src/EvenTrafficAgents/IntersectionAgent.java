@@ -1,4 +1,4 @@
-package TraffiCarAgents;
+package EvenTrafficAgents;
 
 import jade.core.*;
 import jade.core.behaviours.*;
@@ -12,19 +12,24 @@ import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
-import TraffiCarBehaviours.*;
+import EvenTrafficBehaviours.*;
 
-public class TrafficManagerAgent extends Agent {
-	
+
+
+public class IntersectionAgent extends Agent {
+
+	private int x;
+	private int y;
+	private String currentDirection;
 	//Rejestracja typ agenta, aby później łatwo go znaleźć
 	//Dodanie odpowiednią klase zachowań 
-	protected void setup()
-	{
+	protected void setup() {
+		
 		DFAgentDescription dfd = new DFAgentDescription();
 		dfd.setName(getAID());
 		ServiceDescription sd = new ServiceDescription();
-		sd.setType("TrafficManager");
-		sd.setName("TrafficManagerAgent");
+		sd.setType("intersection");
+		sd.setName("intersectionAgent");
 		dfd.addServices(sd);
 		try {
 			DFService.register(this, dfd);
@@ -32,14 +37,20 @@ public class TrafficManagerAgent extends Agent {
 		catch (FIPAException fe) {
 			fe.printStackTrace();
 		}
-		TrafficManagerBehaviour trafficManager = new TrafficManagerBehaviour(this);
-		addBehaviour(trafficManager);
+		// Ustawienie początkowego położenia agenta
+		Object[] objects =getArguments();
+		x=Integer.parseInt((String)objects[0]);
+		y=Integer.parseInt((String)objects[1]);
+		
+		IntersectionAgentBehaviour intersectionBehaviour = new IntersectionAgentBehaviour(this,x,y);
+		addBehaviour(intersectionBehaviour);
+		System.out.println("Hallo! IntersectionAgent "+getAID().getName()+" is ready.");
+		System.out.println("x= "+x+" y=" + y);
 	}
 
-	protected void takeDown()
-	{
+	protected void takeDown() {
 	    // Printout a dismissal message
-	    System.out.println("CarAgent "+getAID().getName()+" terminating.");
-	}
+	    System.out.println("IntersectionAgent "+getAID().getName()+" terminating.");
+	  }
 	
 }

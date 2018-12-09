@@ -1,4 +1,4 @@
-package TraffiCarBehaviours;
+package EvenTrafficBehaviours;
 
 import jade.core.*;
 import jade.core.behaviours.*;
@@ -10,7 +10,7 @@ import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import java.util.ArrayList;
-import TrafficarClasses.*;
+import EvenTrafficClasses.*;
 
 public class IntersectionAgentBehaviour extends CyclicBehaviour 
 {
@@ -59,9 +59,10 @@ public class IntersectionAgentBehaviour extends CyclicBehaviour
 				if(msgs!=null && msgs.size()>0)
 				{
 					ambulanceDirection=msgs.get(0).getContent();
+					System.out.println("!!!!!!!!!!!!!!!!!!!INTERSECTION GOT request. DIrection = " + ambulanceDirection);
 					if((new String(ambulanceDirection).equals("north")) || (new String(ambulanceDirection).equals("south")))
 						lightColor="green";
-					else
+					else if((new String(ambulanceDirection).equals("east")) || (new String(ambulanceDirection).equals("west")))
 						lightColor="red";
 					
 					startTime=System.currentTimeMillis();

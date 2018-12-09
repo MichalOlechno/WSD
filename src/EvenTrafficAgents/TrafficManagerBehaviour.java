@@ -1,4 +1,4 @@
-package TraffiCarBehaviours;
+package EvenTrafficBehaviours;
 
 import jade.core.*;
 import jade.core.behaviours.*;
@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
-import TrafficarClasses.*;
+import EvenTrafficClasses.*;
 
 public class TrafficManagerBehaviour extends CyclicBehaviour 
 {
@@ -81,6 +81,7 @@ public class TrafficManagerBehaviour extends CyclicBehaviour
 			closeAgents=GetCloseAgents(ambulance.x,ambulance.y,ambulance.direction);
 			for(AgentClass closeAgent:closeAgents)
 			{
+				System.out.println("CLOSE AGENTS:" + closeAgent.name);
 				sendRequestMessageToCarAgent(closeAgent,ambulance);
 			}
 		}
@@ -101,11 +102,11 @@ public class TrafficManagerBehaviour extends CyclicBehaviour
 			{
 				if(isListContainAgent(closeAgents,agent))
 					agentWhichShouldntGoBackOnTrack.add(agent);
-				System.out.println("QUERY IF AGENTS:" + agent.name);
+				//System.out.println("QUERY IF AGENTS:" + agent.name);
 			}
 			for(AgentClass agent:closeAgents)
 			{
-				System.out.println("CLOSE AGENTS:" + agent.name);
+			
 			}
 		}
 		for(AgentClass agent:queryIfAgents)
@@ -162,7 +163,7 @@ public class TrafficManagerBehaviour extends CyclicBehaviour
 		msg.addReceiver(carAgent.aid);
 		myAgent.send(msg);
 	}
-	//wysłanie wiadomości typu request. W tym przypadku nie wysyłamy pełnych danych o karetce, wystarczy jedynie kierunek
+	//wysłanie wiadomości typu request. W tym przypadku nie wysyłamy pełnych danych o karetce, wystarczy jedynie kierunek. Wiadomość jest wysyłana zarówno samochodom jak i światłom drogowym.
 	public void sendRequestMessageToCarAgent(AgentClass carAgent,AgentClass ambulance)
 	{
 		ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
@@ -233,15 +234,15 @@ public class TrafficManagerBehaviour extends CyclicBehaviour
 	// sprawdzenie czy agenty znajdują się na tym samym odcinku. Pierwszy warunek : Math.abs(agent.y-y))<=1 uwzględnia również agenty, które robią miejsce ambulansowi
 	public boolean AgentsOnTheSameLine(double x, double y,String direction, AgentClass agent)
 	{
-		if((Math.abs(agent.y-y))<=1 && x<=20 && agent.x<=20 && (new String(direction).equals(agent.direction)))
+		if((Math.abs(agent.y-y))<=1 && x<=20 && agent.x<=20 && (new String(direction).equals(agent.direction) || new String(agent.direction).equals("null")))
 			return true;
-		if((Math.abs(agent.y-y))<=1 && x>=20 && x<=40 && agent.x>=20 && agent.x<=40 && (new String(direction).equals(agent.direction)))
+		if((Math.abs(agent.y-y))<=1 && x>=20 && x<=40 && agent.x>=20 && agent.x<=40 && (new String(direction).equals(agent.direction)|| new String(agent.direction).equals("null")))
 			return true;
-		if((Math.abs(agent.y-y))<=1 && x>=40 && agent.x>=40 && (new String(direction).equals(agent.direction)))
+		if((Math.abs(agent.y-y))<=1 && x>=40 && agent.x>=40 && (new String(direction).equals(agent.direction) || new String(agent.direction).equals("null")))
 			return true;
-		if((Math.abs(agent.x-x))<=1 && y<=20 && agent.y<=20 && (new String(direction).equals(agent.direction)))
+		if((Math.abs(agent.x-x))<=1 && y<=20 && agent.y<=20 && (new String(direction).equals(agent.direction) || new String(agent.direction).equals("null")))
 			return true;
-		if((Math.abs(agent.x-x))<=1 && y>=20 && agent.y>=20 && (new String(direction).equals(agent.direction)))
+		if((Math.abs(agent.x-x))<=1 && y>=20 && agent.y>=20 && (new String(direction).equals(agent.direction) || new String(agent.direction).equals("null")))
 			return true;
 		return false;
 	}

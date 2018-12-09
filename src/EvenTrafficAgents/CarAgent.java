@@ -1,4 +1,4 @@
-package TraffiCarAgents;
+package EvenTrafficAgents;
 
 import jade.core.*;
 import jade.core.behaviours.*;
@@ -12,22 +12,23 @@ import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
-import TraffiCarBehaviours2.*;
+import EvenTrafficBehaviours.*;
 
 
-public class AmbulanceAgent extends Agent {
+public class CarAgent extends Agent {
 
 	private double x;
 	private double y;
 	private String currentDirection;
+	
 	//Rejestracja typ agenta, aby później łatwo go znaleźć
 	//Dodanie odpowiednią klase zachowań 
 	protected void setup() {
 		DFAgentDescription dfd = new DFAgentDescription();
 		dfd.setName(getAID());
 		ServiceDescription sd = new ServiceDescription();
-		sd.setType("ambulance");
-		sd.setName("ambulanceAgent");
+		sd.setType("car");
+		sd.setName("carAgent");
 		dfd.addServices(sd);
 		try {
 			DFService.register(this, dfd);
@@ -35,24 +36,22 @@ public class AmbulanceAgent extends Agent {
 		catch (FIPAException fe) {
 			fe.printStackTrace();
 		}
-		
 		// Ustawienie początkowego położenia agenta
 		Object[] objects =getArguments();
 		x=Double.parseDouble((String)objects[0]);
 		y=Double.parseDouble((String)objects[1]);
 		GetNode();
-		 AmbulanceBehaviour ambulanceBehaviour = new AmbulanceBehaviour(this,x,y,currentDirection);
-			addBehaviour(ambulanceBehaviour);
+		 CarBehaviour carBehaviour = new CarBehaviour(this,x,y,currentDirection);
+			addBehaviour(carBehaviour);
 		 
 		System.out.println("Hallo! CarAgent "+getAID().getName()+" is ready.");
 	}
 
 	protected void takeDown() {
-	    // Printout a dismissal message
 	    System.out.println("CarAgent "+getAID().getName()+" terminating.");
 	}
 	// Wyznaczenie początkowego kierunku ruchu agenta
-	void GetNode()
+	protected void GetNode()
 	{
 		if(x<20 && y==20)
 			currentDirection="east";
